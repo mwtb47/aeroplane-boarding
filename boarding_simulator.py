@@ -229,7 +229,9 @@ class Boarding:
             'mediumslateblue', 'darkorchid', 'lightblue',  'olive', 'salmon',
             'chocolate', 'steelblue', 'magenta', 'seagreen', 'darkviolet',
             'lightseagreen',
-        ] 
+        ]
+        colours = ['#003f5c', '#374c80', '#7a5195', '#bc5090', '#ef5675',
+                   '#ff764a', '#ffa600']
         colours = colours * (len(self.plane) // len(colours) + 1)
         self.colours = colours[:len(self.plane)]
             
@@ -258,7 +260,101 @@ class Boarding:
         
         self.positions = positions
         self.colour_list = [self.colours for i in range(len(self.positions))]
-    
+        
+        
+    def plot_boarding_order(self, dpi):
+        """Save a png file showing the order of boarding for a given 
+        boarding method.
+        """
+        plane = self.create_passengers()
+        x = [plane[passenger]['target'][0] for passenger in plane]
+        y = [plane[passenger]['target'][1] for passenger in plane]
+        
+        fig = plt.figure(figsize=(12, 12 * (self.abreast / self.rows)), 
+                         dpi=dpi)
+        plt.axes(xlim=(0.5, self.rows + 0.5), ylim=(0.5, self.abreast + 1.5))
+        plt.xticks([])
+        plt.yticks([])
+        
+        # Add squares to represent the seats and colour by boarding 
+        # order.
+        marker_area = (864 * self.abreast / self.rows / (self.abreast + 4)) ** 2
+        plt.scatter(
+            x, 
+            y, 
+            s=marker_area, 
+            marker='s', 
+            c=list(plane.keys()), 
+            cmap='BuGn', 
+            linewidths=1, 
+            edgecolors='black',
+        )
+        
+        # Add text labels showing the order in which each passenger 
+        # boards.
+        text_colour = (['black'] * int(0.5 * len(colours)) 
+                       + ['white'] * int(0.5 * len(colours)))
+        for x_coord, y_coord, text, color in zip(x, y, plane.keys(), text_colour):
+            plt.text(
+                x_coord, 
+                y_coord, 
+                s=text+1, 
+                color=c, 
+                size=(864 * self.abreast / self.rows / (self.abreast + 4)) / 2
+                horizontalalignment='center', 
+                verticalalignment='center',
+            )
+            
+        # Add dashed lines to show the centre aisle.
+        plt.hlines(
+            y=self.middle-0.5, 
+            xmin=0.5,
+            xmax=self.rows+0.5, 
+            linestyle='--',
+        )
+        plt.hlines(
+            y=self.middle+0.5,
+            xmin=0.5, 
+            xmax=self.rows+0.5, 
+            linestyle='--',
+        )
+        
+        # Add arrow showing the boarding direction
+        plt.arrow(
+            x=2, 
+            y=self.middle, 
+            dx=1,
+            dy=0, 
+            width=0.01, 
+            head_width=0.2,
+            head_length=0.2, 
+            length_includes_head=True,
+            overhang=0.5
+        )
+        
+        # Add text labeling the front and the rear of the plane
+        plt.text(
+            x=1, 
+            y=self.middle, 
+            s='Front', 
+            size=(864 * self.abreast / self.rows / (self.abreast + 4)/3),
+            horizontalalignment='center', 
+            verticalalignment='center',
+        )
+        plt.text(
+            x=self.rows, 
+            y=self.middle, 
+            s='Rear', 
+            size=(864 * self.abreast / self.rows / (self.abreast + 4)/3),
+            horizontalalignment='center',
+            verticalalignment='center',
+        )
+        
+        fig.tight_layout()
+        filename = 'boarding_methods/' + self.method + '.png'
+        filename = filename.replace(' ', '_')
+        fig.savefig(filename, dpi=dpi)
+        
     def create_GIF(self, dpi):
         """Create a GIF where each frame of the animation represents the 
         position of each passenger after each passenger has had the 
@@ -277,7 +373,8 @@ class Boarding:
                  else str(row) + str(aisle_labels[aisle - 1]) 
                  for row,aisle in zip(x,y)]
     
-        fig = plt.figure(figsize=(12, 12 * (self.abreast / self.rows)), dpi=dpi)
+        fig = plt.figure(figsize=(12, 12 * (self.abreast / self.rows)),
+                         dpi=dpi)
         plt.axes(xlim=(0.5, self.rows + 0.5), ylim=(0.5, self.abreast + 1.5))
         
         # Not sure why but without this the title font is heavily 
@@ -290,17 +387,37 @@ class Boarding:
         # Add squares to represent the seats and add text to show their 
         # number.
         marker_area = (864 * self.abreast / self.rows / (self.abreast + 4)) ** 2
-        plt.scatter(x, y, s=marker_area, marker='s', color='white', 
-                    linewidths=1, edgecolors='black')
+        plt.scatter(
+            x, 
+            y, 
+            s=marker_area,
+            marker='s', 
+            color='white', 
+            linewidths=1, 
+            edgecolors='black',
+        )
         for x_coord, y_coord, text in zip(x,y,seats):
-            plt.text(x_coord, y_coord, s=text, horizontalalignment='center', 
-                     verticalalignment='center',)
+            plt.text(
+                x_coord, 
+                y_coord, 
+                s=text, 
+                horizontalalignment='center', 
+                verticalalignment='center',
+            )
         
         # Add dashed lines to show the centre aisle.
-        plt.hlines(y=self.middle-0.5, xmin=0.5, xmax=self.rows+0.5, 
-                   linestyle='--')
-        plt.hlines(y=self.middle+0.5, xmin=0.5, xmax=self.rows+0.5, 
-                   linestyle='--')
+        plt.hlines(
+            y=self.middle-0.5,
+            xmin=0.5,
+            xmax=self.rows+0.5, 
+            linestyle='--',
+        )
+        plt.hlines(
+            y=self.middle+0.5,
+            xmin=0.5,
+            xmax=self.rows+0.5, 
+            linestyle='--',
+        )
         
         plt.xticks([])
         plt.yticks([])
@@ -316,12 +433,14 @@ class Boarding:
         
         fig.tight_layout()
 
-        anim = FuncAnimation(fig, animate, frames=len(self.frames), 
-                             interval=2000,
-                             fargs=(self.colour_list, self.positions, 
-                                    scat)
-                            )
-        anim.save('graphs/' + self.method + '.gif', writer='pillow', dpi=dpi)
+        anim = FuncAnimation(
+            fig, 
+            animate, 
+            frames=len(self.frames), 
+            interval=300,
+            fargs=(self.colour_list, self.positions, scat)
+        )
+        anim.save('GIFs/' + self.method + '.gif', writer='pillow', dpi=dpi)
         plt.close()
     
     def return_steps(self):
@@ -332,8 +451,11 @@ class Boarding:
         return len(self.frames)
 
 
-def main():
-    """Initiate the Boarding class and run methods to create the GIF."""
+def main(choice):
+    """Initiate the Boarding class and run methods to either produce a 
+    GIF of the boarding process or a png file showing the order in which 
+    passengers will board for a given method.
+    """
     rows = int(input("Number of rows: "))
     abreast= int(input("Seats per row: "))
     method = input("Boarding method: ")
@@ -343,7 +465,15 @@ def main():
     dpi = int(input("GIF dpi: "))
     
     aero = Boarding(rows, abreast, method, bag_percent, slow_average_fast)
-    aero.create_GIF(dpi)
+    
+    if choice == 'GIF':
+        aero.create_GIF(dpi)
+    elif choice == 'boarding order':
+        aero.plot_boarding_order(dpi)
+    else:
+        print("Choose 'GIF' or 'boarding order'")
 
+        
 if __name__ == "__main__":
-    main()
+    choice = input("'GIF' or 'boarding order'")
+    main(choice)
