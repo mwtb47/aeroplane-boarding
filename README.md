@@ -6,7 +6,7 @@ The Mythbusters did an experiment to measure the time taken to board using diffe
 
 ## Boarding Methods
 
-The following provide a description of the boarding methods and illustrations of the order in which passengers board in each method. All passengers board from the front, with passenger 1 boarding first and, in this set up, passenger 90 boarding last.
+The following provide a description of the boarding methods and illustrations of the order in which passengers board in each method. All passengers board from the front, with passenger 1 boarding first and, in this set up, passenger 90 boarding last. Annimations of an example of each boarding can be found in the GIFs folder above.
 
 #### Back-to-front
 Passengers enter the plane in order of their row, starting with the last row. Within each row, the order of the passengers is random.
