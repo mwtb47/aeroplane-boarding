@@ -2,7 +2,7 @@ from ast import literal_eval
 from copy import deepcopy
 from itertools import product
 from random import choice, shuffle
-from math import ceil
+from math import ceil, floor
 
 from matplotlib.animation import FuncAnimation, PillowWriter
 import matplotlib.pyplot as plt
@@ -396,8 +396,8 @@ class Boarding:
         
         # Add text labels showing the order in which each passenger 
         # boards.
-        text_colour = (['black'] * int(0.5 * len(plane)) 
-                       + ['white'] * int(0.5 * len(plane)))
+        text_colour = (['black'] * ceil(0.5 * len(plane)) 
+                       + ['white'] * floor(0.5 * len(plane)))
         for x_coord, y_coord, text, colour in zip(x, y, plane.keys(), text_colour):
             plt.text(
                 x_coord, 
