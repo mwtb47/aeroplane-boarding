@@ -173,7 +173,7 @@ class Boarding:
                     if self.method == 'reverse WMA':
                         to_shuffle.append((self.rows - row, aisle))
                     else:
-                        to_shuffle.append((row, aisle))
+                        to_shuffle.append((row + 1, aisle))
                     shuffle(to_shuffle)
                 groups.append(to_shuffle)
         return [passenger for group in groups for passenger in group]
