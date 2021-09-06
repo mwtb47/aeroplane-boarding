@@ -306,7 +306,90 @@ class PlotSimulations:
         )
         
         fig.write_image(filename, height=500, width=1200, scale=2.5)
+        
+    def plot_regression_by_method(self, filename):
+        """"""
+        df = self.df
+        df['bag_percent'] = df['bag_percent'] * 100
+        methods = df['method'].unique()
+        colours = ['red', 'green', 'blue', 'orange', 'lightblue', 'pink', 
+                   'purple']
 
+        fig = go.Figure()
+
+        for k, (method, colour) in enumerate(zip(methods, colours)):
+            data = df[df['method'] == method].copy()
+            results = smf.ols('steps ~ bag_percent', data).fit()
+            r_2 = results.rsquared
+            m = results.params[1]
+            c = results.params[0]
+
+            fig.add_trace(
+                go.Scatter(
+                    x=[0,100],
+                    y=[c, 100*m+c],
+                    line=dict(color=colour),
+                    mode='lines',
+                    name=method,
+                    showlegend=False
+                )
+            )
+            text_formula = "$s = {} * p + {}$".format(round(m, 2), round(c,2))
+            text_r2 = "$R^2 = {}$".format(round(r_2, 2))
+            
+            # Add a line, similar to a legend, and then add the method 
+            # name, formula for the OLS line and the R-squared value.
+            fig.add_shape(
+                type='line', 
+                x0=2, x1=5,
+                y0=320-k*14, y1=320-k*14, 
+                line=dict(color=colour)
+            )
+            fig.add_annotation(
+                text=method, 
+                x=6, 
+                y=320-k*14, 
+                showarrow=False,
+                xanchor='left'
+            )
+            fig.add_annotation(
+                text=text_formula,
+                x=15,
+                y=320-k*14, 
+                showarrow=False,
+                xanchor='left'
+            )
+            fig.add_annotation(
+                text=text_r2, 
+                x=27,
+                y=320-k*14,
+                showarrow=False, 
+                xanchor='left'
+            )
+
+        fig.update_layout(
+            title=("Linear OLS Models to Predict the Effect of Changing the "
+                   "Bag Percentage on the Number of Boarding Steps<br>for "
+                   "each Boarding Method"),
+            plot_bgcolor='white', 
+            xaxis=dict(
+                title=(r"$\text{Percentage of Passengers with Hand Luggage } "
+                       "(p)$"),
+                linecolor='black',
+                linewidth=2, 
+                gridcolor='rgb(240,240,240)',
+                gridwidth=1
+            ),
+            yaxis=dict(
+                title=r"$\text{Boarding Steps } (s)$",
+                linecolor='black',
+                linewidth=2, 
+                gridcolor='rgb(240,240,240)', 
+                gridwidth=1
+            )
+        )
+        
+        fig.write_image(filename, height=500, width=1200, scale=2.5)
         
 def main():
     """Ask to run either simulations or plotting of simulation data. 
@@ -317,10 +400,10 @@ def main():
     produce a chart summarising the simulations data.
     """
     sim_or_plot = input("simulate or plot?")
-    output = input(("Choose one of: 'by method', 'by aisles', "
-                    "'by number groups'"))
     
     if sim_or_plot == 'simulate':
+        output = input(("Choose one of: 'by method', 'by aisles', "
+                        "'by number groups'"))
         rows = int(input("Number of rows: "))
         abreast= literal_eval(input("Seats per row: "))
         bag_percent = float(input("Bag percentage: "))
@@ -338,6 +421,8 @@ def main():
             print("Invalid choice")
     
     elif sim_or_plot == 'plot':
+        output = input(("Choose one of: 'by method', 'by aisles', "
+                        "'by number groups', 'regression by method'"))
         filename = input("Filename: ")
         if output == 'by method':
             df = pd.read_csv('data/by_method_data.csv')
@@ -351,6 +436,10 @@ def main():
             df = pd.read_csv('data/by_number_groups_data.csv')
             aero = PlotSimulations(df)
             aero.plot_steps_by_n_groups(filename)
+        elif output == 'regression by method':
+            df = pd.read_csv('data/by_method_data.csv')
+            aero = PlotSimulations(df)
+            aero.plot_regression_by_method(filename)
         else:
             print("Invalid choice")
     
