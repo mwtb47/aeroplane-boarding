@@ -51,7 +51,9 @@ Passengers enter the plane sorted by aisle and row. Passengers from one window a
 <img src="boarding_methods/Standard/optimal.png" alt="Optimal boarding method" width="75%"/>
 
 
+<h1 align="center">Animations</h1>
 
+The folder boarding_animations contains GIFs of one simulation of each boarding method. In each simulation, the percentage of passengers with hand luggage is 50% and the percentage of slow, average and fast boarding is 30%, 40%, and 30% respectively. The title in the animation shows the total number of steps taken.
 
 <h1 align="center">Analysis</h1>
 
