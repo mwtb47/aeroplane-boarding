@@ -1,4 +1,4 @@
-# Aeroplane Boarding
+<h1 align="center">Aeroplane Boarding Simulation</h1>
 
 This is a first attempt to simulate the boarding of an aeroplane to see which order of passenger entry results in the shortest boarding time. There is also some analysis of how variables such as percentage of passengers with hand luggage, number of boarding aisles and number of boarding groups affects these boarding times. 
 
@@ -6,14 +6,58 @@ This simulation does not account for practices airlines implement, such as board
 
 The Mythbusters did an experiment to measure the time taken to board using different methods in a more real world setting, and, as they used people, how passengers rated those boarding methods. A summary of their findings can be found [here](https://travelupdate.com/mythbusters-boarding-styles/).
 
-## Boarding Methods
 
-A description of the boarding methods can be found in the boarding_methods folder. The boarding_animations folders contains an animated example of each boarding method.
+
+
+
+<h1 align="center">Boarding Methods</h1>
+
+A combination of boarding methods are used ranging from completely random to where the exact order is specified. Below is a summary of the standard version of each method. Similar summaries are available for versions of these methods with either 2 boarding aisles or grouped boarding in the boarding_methods folder.
+
+Each simulation takes the following arguments:
+- rows - the number of rows the aeroplane has
+- abreast - the seat configuration. 3,3 means 3 seats, aisle, 3 seats (shown below). 2,3,2 means 2 seats, aisle, 3 seats, aisle, 2 seats.
+- boarding_method - one of the seven methods shown below
+- bag_percent - the percentage of passengers with hand luggage.
+- slow_average_fast - the percentage of passengers who are slow, average and fast at putting their hand luggage away. Slow, average, and fast passengers take 3, 2, and 1 steps respectively to put their bags in the overhead compartment. Passengers without hand luggage take 0 steps.
+- n_groups - the number of groups passengers board in. This only has an effect on front-to-back, back-to-front, front WMA and reverse WMA methods. A more detailed descriptions can be found in the boarding_methods folder.
+
+#### Back-to-front
+Passengers enter the plane in order of their row, starting with the last row. Within each row, the order of the passengers is random.
+<img src="boarding_methods/Standard/back-to-front.png" alt="Back-to-front boarding method" width="70%"/>
+
+#### Front-to-back
+Passengers enter the plane in order of their row, starting with the first row. Within each row, the order of the passengers is random.
+<img src="boarding_methods/Standard/front-to-back.png" alt="Front-to-back boarding method" width="70%"/>
+
+#### Window-middle-aisle
+Passengers enter the plane starting by window seats and moving towards ailse seats. Within each aisle, passengers enter in a random order.
+![alt text for screen readers](boarding_methods/Standard/WMA.png "Window-middle-aisle boarding method")
+
+#### Back-to-front window-middle-aisle
+Passengers enter the plane in order of their row, starting with the last row. Within each row, passengers are sorted from window seats to aisle seats.
+![alt text for screen readers](boarding_methods/Standard/reverse_WMA.png "Back-to-front window-middle-aisle boarding method")
+
+#### Front-to-back window-middle-aisle
+Passengers enter the plane in order of their row, starting with the first row. Within each row, passengers are sorted from window seats to aisle seats.
+![alt text for screen readers](boarding_methods/Standard/front_WMA.png "Front-to-back window-middle-aisle boarding method")
+
+#### Random
+Passengers enter the plane in a random order.
+![alt text for screen readers](boarding_methods/Standard/random.png "Random boarding order")
+
+#### Optimal
+Passengers enter the plane sorted by aisle and row. Passengers from one window aisle enter, starting with the rear row. The other window aisle follows. Then the next aisle in etc.
+![alt text for screen readers](boarding_methods/Standard/optimal.png "Optimal boarding method")
 
 #### Bag percentage
 This is the percentage of passengers with hand luggage. Passengers can either be slow, average or fast at placing their bag in the overhead compartment. Slow, average and fast passengers take three, two and one steps respectively to place their bags away. Passengers with no hand luggage take zero steps. All analysis below is performed with 50% passengers with hand luggage and 30%, 40% and 30% being slow, average and fast respectively.
 
-## Analysis
+
+
+
+
+<h1 align="center">Analysis</h1>
 
 ### Steps per boarding method by bag percentage
 
