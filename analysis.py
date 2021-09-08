@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import statsmodels.formula.api as smf
 
 from boarding_simulator import Boarding
 
@@ -33,7 +34,7 @@ class Simulations:
         """Save a csv file with the results from 1,000 simulations of 
         each combination of method and bag percentage.
         """
-        bag_percentages = [0, 0.2, 0.4, 0.6, 0.8, 1]
+        bag_percentages = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1]
         parameters = product(self.methods, bag_percentages)
         
         df = pd.DataFrame()
@@ -182,7 +183,7 @@ class PlotSimulations:
               .agg({'steps': ['mean', 'std']})
              )
         
-        colours = ['#ff6e54', '#ffa600']
+        colours = ['rgba(0,63,92,{})', 'rgba(255,166,0,{})']
         
         fig = go.Figure()
         
@@ -191,7 +192,10 @@ class PlotSimulations:
                 go.Bar(
                     x=list(df[df['configuration'] == config]['method']),
                     y=list(df[df['configuration'] == config][('steps', 'mean')]),
-                    marker=dict(color=colour),
+                    marker=dict(
+                        color=colour.format(0.7), 
+                        line=dict(color=colour.format(1), width=2)
+                    ),
                     name=str(config).replace('[', '').replace(']', ''),
                     error_y=dict(
                         array=list(df[df['configuration'] == config][('steps', 'std')])
@@ -201,13 +205,13 @@ class PlotSimulations:
             
         fig.update_layout(
             barmode='group', 
+            bargroupgap=0.05,
             title=("Mean Steps to Board a Plane by Boarding Method<br><sub>"
                    "For each boarding method, 1,000 simulations were run for "
                    "each seating arrangement.<br>Error bars show the standard "
                    "deviation."), 
-            legend=dict(title="<b>Seating arrangement</b>"),
+            legend=dict(title="Seating arrangement"),
             xaxis=dict(
-                title="Boarding Method", 
                 linewidth=2, 
                 linecolor='rgb(80,80,80)',
             ),
@@ -218,6 +222,7 @@ class PlotSimulations:
                 gridwidth=1, 
                 gridcolor='rgba(200,200,200,0.5)'
             ),
+            margin=dict(t=140),
             paper_bgcolor='white',
             plot_bgcolor='white',
         )
@@ -294,7 +299,7 @@ class PlotSimulations:
                 title="% Passengers<br>with Bag",
                 traceorder='reversed'
             ),
-            margin=dict(t=130),
+            margin=dict(t=150),
             xaxis=xaxis,
             xaxis2=xaxis,
             xaxis3=xaxis,
@@ -305,7 +310,7 @@ class PlotSimulations:
             yaxis4=yaxis,
         )
         
-        fig.write_image(filename, height=500, width=1200, scale=2.5)
+        fig.write_image(filename, height=700, width=1200, scale=2.5)
         
     def plot_regression_by_method(self, filename):
         """"""
@@ -386,7 +391,7 @@ class PlotSimulations:
                 linewidth=2, 
                 gridcolor='rgb(240,240,240)', 
                 gridwidth=1
-            )
+            ),
         )
         
         fig.write_image(filename, height=500, width=1200, scale=2.5)
