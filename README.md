@@ -20,7 +20,7 @@ Each simulation takes the following arguments:
 - boarding_method - one of the seven methods shown below
 - bag_percent - the percentage of passengers with hand luggage.
 - slow_average_fast - the percentage of passengers who are slow, average and fast at putting their hand luggage away. Slow, average, and fast passengers take 3, 2, and 1 steps respectively to put their bags in the overhead compartment. Passengers without hand luggage take 0 steps.
-- n_groups - the number of groups passengers board in. This only has an effect on front-to-back, back-to-front, front WMA and reverse WMA methods. A more detailed descriptions can be found in the boarding_methods folder.
+- n_groups - the number of groups passengers board in. This only has an effect on front-to-back, back-to-front, front-to-back WMA and back-to-front WMA methods. A more detailed descriptions can be found in the boarding_methods folder.
 
 ### Back-to-front
 Passengers enter the plane in order of their row, starting with the last row. Within each row, the order of the passengers is random.  
@@ -36,11 +36,11 @@ Passengers enter the plane starting by window seats and moving towards ailse sea
 
 ### Back-to-front window-middle-aisle
 Passengers enter the plane in order of their row, starting with the last row. Within each row, passengers are sorted from window seats to aisle seats.  
-<img src="boarding_methods/Standard/reverse_WMA.png" alt="Back-to-front window-middle-aisle boarding method" width="75%"/>
+<img src="boarding_methods/Standard/back-to-front_WMA.png" alt="Back-to-front window-middle-aisle boarding method" width="75%"/>
 
 ### Front-to-back window-middle-aisle
 Passengers enter the plane in order of their row, starting with the first row. Within each row, passengers are sorted from window seats to aisle seats.  
-<img src="boarding_methods/Standard/front_WMA.png" alt="Front-to-back window-middle-aisle boarding method" width="75%"/>
+<img src="boarding_methods/Standard/front-to-back_WMA.png" alt="Front-to-back window-middle-aisle boarding method" width="75%"/>
 
 ### Random
 Passengers enter the plane in a random order.  
@@ -63,7 +63,7 @@ The boxplot below shows the results of running each boarding method 1,000 times 
 
 For all boarding methods in this model, the number of steps taken to board decreases as the percentage of passengers with bags decreases. The magnitude of the change between different bag percentages varies across methods, with the front-to-back and back-to-front methods showing a significant decrease in boarding steps as bag percentage decreases, whereas the optimal method shows only a very small decrease.
 
-On average, the opitmal boarding method is the fastest at all bag percentages other than 0%, where the reverse WMA method is as fast. The two methods which start boarding from the front rows are the slowest.  
+On average, the opitmal boarding method is the fastest at all bag percentages other than 0%, where the back-to-front WMA method is as fast. The two methods which start boarding from the front rows are the slowest.  
 
 <img src="graphs/steps_by_method.png" alt="Steps by Method" width="100%"/>
 
