@@ -28,14 +28,16 @@ class Boarding:
             WMA - passengers are sorted by aisles, starting with the 
                   window seats and ending with the aisle seats. Within 
                   each aisle the order is random. 
-            front WMA - passengers are sorted by row starting at the 
-                        front. Within each row, passengers are sorted so
-                        those in window seats enter first and those in 
-                        aisle seats last.
-            reverse WMA - passengers are sorted by row starting at the 
-                          front. Within each row, passengers are sorted
-                          so those in window seats enter first and those
-                          in aisle seats last.
+            front-to-back WMA - passengers are sorted by row starting 
+                                at the front. Within each row,
+                                passengers are sorted so those in window
+                                seats enter first and those in aisle 
+                                seats last.
+            back-to-front WMA - passengers are sorted by row starting at
+                                the front. Within each row, passengers 
+                                are sorted so those in window seats 
+                                enter first and those in aisle seats
+                                last.
             optimal - passengers are sorted by aisle, starting by window 
                       seats and ending with aisle seats. Within each 
                       aisle passengers are sorted by rear row to front 
@@ -76,9 +78,9 @@ class Boarding:
             shuffle(passengers)
             passengers.sort(key=lambda a: self.aisle_order.index(a[1]), 
                             reverse=False)
-        elif self.method == 'front WMA':
+        elif self.method == 'front-to-back WMA':
             return self.group_WMA()
-        elif self.method == 'reverse WMA':
+        elif self.method == 'back-to-front WMA':
             return self.group_WMA()
         elif self.method == 'optimal':
             passengers.sort(
@@ -170,7 +172,7 @@ class Boarding:
             for aisle in self.aisle_order:
                 to_shuffle = []
                 for row in range(group_index[k], i):
-                    if self.method == 'reverse WMA':
+                    if self.method == 'back-to-front WMA':
                         to_shuffle.append((self.rows - row, aisle))
                     else:
                         to_shuffle.append((row + 1, aisle))
@@ -349,12 +351,6 @@ class Boarding:
                 else:
                     plane[passenger]['location'] = current_position
                     temp.append([current_position[0], current_position[1]])
-                """elif current_position == (0,0):
-                    plane[passenger]['location'] = (0,0)
-                    temp.append([0,0])
-                else:
-                    plane[passenger]['location'] = (current_position[0], self.middle)
-                    temp.append([current_position[0], self.middle])"""
             positions.append(temp)
         
         self.positions = positions
@@ -561,7 +557,7 @@ class Boarding:
         return len(self.frames)
 
 
-def main(ouptut):
+def main(output):
     """Initiate the Boarding class and run methods to either produce a 
     GIF of the boarding process or a png file showing the order in which 
     passengers will board for a given method.

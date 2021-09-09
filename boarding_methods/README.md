@@ -22,11 +22,11 @@ Passengers enter the plane starting by window seats and moving towards ailse sea
 
 #### Back-to-front window-middle-aisle
 Passengers enter the plane in order of their row, starting with the last row. Within each row, passengers are sorted from window seats to aisle seats.
-![alt text for screen readers](Standard/reverse_WMA.png "Back-to-front window-middle-aisle boarding method")
+![alt text for screen readers](Standard/back-to-front_WMA.png "Back-to-front window-middle-aisle boarding method")
 
 #### Front-to-back window-middle-aisle
 Passengers enter the plane in order of their row, starting with the first row. Within each row, passengers are sorted from window seats to aisle seats.
-![alt text for screen readers](Standard/front_WMA.png "Front-to-back window-middle-aisle boarding method")
+![alt text for screen readers](Standard/front-to-back_WMA.png "Front-to-back window-middle-aisle boarding method")
 
 #### Random
 Passengers enter the plane in a random order.
@@ -54,11 +54,11 @@ Passengers enter the plane starting by window seats and moving towards ailse sea
 
 #### Back-to-front window-middle-aisle
 Passengers enter the plane in order of their row, starting with the last row. Within each row, passengers are sorted from window seats to aisle seats.
-![alt text for screen readers](2_Aisles/reverse_WMA_double.png "Back-to-front window-middle-aisle boarding method double aisle")
+![alt text for screen readers](2_Aisles/back-to-front_WMA_double.png "Back-to-front window-middle-aisle boarding method double aisle")
 
 #### Front-to-back window-middle-aisle
 Passengers enter the plane in order of their row, starting with the first row. Within each row, passengers are sorted from window seats to aisle seats.
-![alt text for screen readers](2_Aisles/front_WMA_double.png "Front-to-back window-middle-aisle boarding method double aisle")
+![alt text for screen readers](2_Aisles/front-to-back_WMA_double.png "Front-to-back window-middle-aisle boarding method double aisle")
 
 #### Random
 Passengers enter the plane in a random order.
@@ -84,8 +84,8 @@ Passengers are grouped by their row and enter starting with the front group. Wit
 #### Back-to-front window-middle-aisle
 Passengers are grouped by their row and enter starting with the rear group. Within each group, the window passengers enter first, followed by the middle passengers and lastly the aisle passengers. The row order is random within each group. The below example shows passengers split into 3 groups.
 
-![alt text for screen readers](Grouped/reverse_WMA_grouped.png "Back-to-front window-middle-aisle boarding method")
+![alt text for screen readers](Grouped/back-to-front_WMA_grouped.png "Back-to-front window-middle-aisle boarding method")
 
 #### Front-to-back window-middle-aisle
 Passengers are grouped by their row and enter starting with the front group. Within each group, the window passengers enter first, followed by the middle passengers and lastly the aisle passengers. The row order is random within each group. The below example shows passengers split into 3 groups.
-![alt text for screen readers](Grouped/front_WMA_grouped.png "Front-to-back window-middle-aisle boarding method")
+![alt text for screen readers](Grouped/front-to-back_WMA_grouped.png "Front-to-back window-middle-aisle boarding method")

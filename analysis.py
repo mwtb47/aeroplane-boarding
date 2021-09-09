@@ -27,8 +27,9 @@ class Simulations:
         self.abreast = abreast
         self.bag_percent = bag_percent
         self.slow_average_fast = slow_average_fast
-        self.methods = ['front-to-back', 'back-to-front', 'WMA', 'front WMA',
-                        'reverse WMA', 'random', 'optimal']
+        self.methods = ['front-to-back', 'back-to-front', 'WMA', 
+                        'front-to-back WMA', 'back-to-front WMA', 'random', 
+                        'optimal']
 
     def steps_by_method(self):
         """Save a csv file with the results from 1,000 simulations of 
@@ -50,10 +51,7 @@ class Simulations:
                 ), 
                 ignore_index=True)
         
-        df['method'] = pd.Categorical(df['method'], self.methods)
-        df = df.sort_values(['method', 'bag_percent'], 
-                            ascending=[True, False])
-        df.to_csv('data/by_method_data.csv', index=False)
+        df.to_csv('data/by_method_data_additional.csv', index=False)
     
     def steps_by_no_aisles(self):
         """Save a csv file with the results from 1,000 simulations of 
@@ -75,18 +73,15 @@ class Simulations:
                      'steps': results}
                 ), 
                 ignore_index=True)
-    
-        df['method'] = pd.Categorical(df['method'], self.methods)
-        df = df.sort_values(['method', 'configuration'], 
-                            ascending=[True, False])
+
         df.to_csv('data/by_aisles_data.csv', index=False)
     
     def steps_by_n_groups(self):
         """Save a csv file with the results from 1,000 simulations of 
         each combination of method, bag percentage and number of groups.
         """
-        methods = ['front-to-back', 'back-to-front', 'front WMA', 
-                   'reverse WMA']
+        methods = ['front-to-back', 'back-to-front', 'front-to-back WMA', 
+                   'back-to-front WMA']
         bag_percentages = [0, 0.5, 1]
         n_groups = [1, 5, 10, 15]
         parameters = product(methods, bag_percentages, n_groups)
@@ -107,10 +102,7 @@ class Simulations:
                     }
                 ), 
                 ignore_index=True)
-            
-        df['method'] = pd.Categorical(df['method'], self.methods)
-        df = df.sort_values(['method', 'n_groups'], 
-                            ascending=[True, False])
+        
         df.to_csv('data/by_number_groups_data.csv', index=False)
 
     
@@ -120,26 +112,31 @@ class PlotSimulations:
     """
     def __init__(self, df):
         self.df = df
+        self.category_order = ['front-to-back', 'back-to-front', 'WMA', 
+                               'front-to-back WMA', 'back-to-front WMA',
+                               'random', 'optimal']
         
     def plot_steps_by_method(self, filename):
         """Plot a boxplot summarising the mean number of steps taken 
         for different boarding methods with different passenger bag 
         percentages and save as a png file.
         """
-        df = self.df
+        df = self.df.copy()
+        df = df.sort_values('steps')
         
         colours = ['#003f5c', '#444e86', '#955196', '#dd5182', '#ff6e54', 
                    '#ffa600']
+        bag_percentages = [1, .8, .6, .4, .2, 0]
         
         fig = go.Figure()
 
-        for percent, colour in zip(df['bag_percent'].unique(), colours):
+        for percent, colour in zip(bag_percentages, colours):
             fig.add_trace(
                 go.Box(
                     x=list(df[df['bag_percent'] == percent]['method']),
                     y=list(df[df['bag_percent'] == percent]['steps']),
                     marker=dict(color=colour),
-                    name=str(percent),
+                    name=str(int(percent*100)),
                     hoverinfo='skip'
                 )
             )
@@ -157,6 +154,7 @@ class PlotSimulations:
                 showline=True,
                 linewidth=2,
                 linecolor='rgb(100,100,100)',
+                categoryarray=self.category_order,
             ),
             yaxis=dict(
                 title="Number of Steps",
@@ -214,13 +212,14 @@ class PlotSimulations:
             xaxis=dict(
                 linewidth=2, 
                 linecolor='rgb(80,80,80)',
+                categoryarray=self.category_order,
             ),
             yaxis=dict(
                 title="Mean Steps", 
                 linewidth=2, 
                 linecolor='rgb(80,80,80)', 
                 gridwidth=1, 
-                gridcolor='rgba(200,200,200,0.5)'
+                gridcolor='rgba(200,200,200,0.5)',
             ),
             margin=dict(t=140),
             paper_bgcolor='white',
@@ -239,11 +238,11 @@ class PlotSimulations:
         df = df.sort_values(['n_groups', 'bag_percent'])
         df['bag_percent']  = [int(n * 100) for n in df['bag_percent']]
         
-        methods = ['front-to-back', 'back-to-front', 'front WMA',
-                   'reverse WMA']
+        methods = ['front-to-back', 'back-to-front', 'front-to-back WMA',
+                   'back-to-front WMA']
         coordinates = list(product(range(1,3), range(1,3)))
-        subplot_titles = ['Front-to-back', 'Back-to-front', 'Front WMA', 
-                          'Reverse WMA']
+        subplot_titles = ['Front-to-back', 'Back-to-front', 
+                          'Front-to-back WMA', 'Back-to-front WMA']
         colours = ['#003f5c', '#955196', '#ff6e54']
         offsets = ['0%', '50%', '100%']
         showlegend_list = [True, False, False, False]
@@ -316,13 +315,12 @@ class PlotSimulations:
         """"""
         df = self.df
         df['bag_percent'] = df['bag_percent'] * 100
-        methods = df['method'].unique()
         colours = ['red', 'green', 'blue', 'orange', 'lightblue', 'pink', 
                    'purple']
 
         fig = go.Figure()
 
-        for k, (method, colour) in enumerate(zip(methods, colours)):
+        for count, (method, colour) in enumerate(zip(self.category_order, colours)):
             data = df[df['method'] == method].copy()
             results = smf.ols('steps ~ bag_percent', data).fit()
             r_2 = results.rsquared
@@ -339,35 +337,37 @@ class PlotSimulations:
                     showlegend=False
                 )
             )
-            text_formula = "$s = {} * p + {}$".format(round(m, 2), round(c,2))
+            text_formula = "$s = {} p + {}$".format(round(m, 2), round(c,2))
             text_r2 = "$R^2 = {}$".format(round(r_2, 2))
             
             # Add a line, similar to a legend, and then add the method 
             # name, formula for the OLS line and the R-squared value.
             fig.add_shape(
                 type='line', 
-                x0=2, x1=5,
-                y0=320-k*14, y1=320-k*14, 
+                x0=2, 
+                x1=5,
+                y0=320 - count * 14, 
+                y1=320 - count * 14, 
                 line=dict(color=colour)
             )
             fig.add_annotation(
                 text=method, 
                 x=6, 
-                y=320-k*14, 
+                y=320 - count * 14, 
                 showarrow=False,
                 xanchor='left'
             )
             fig.add_annotation(
                 text=text_formula,
-                x=15,
-                y=320-k*14, 
+                x=18,
+                y=320 - count * 14, 
                 showarrow=False,
                 xanchor='left'
             )
             fig.add_annotation(
                 text=text_r2, 
-                x=27,
-                y=320-k*14,
+                x=29,
+                y=320 - count * 14,
                 showarrow=False, 
                 xanchor='left'
             )
