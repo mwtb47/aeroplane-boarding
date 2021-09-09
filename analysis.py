@@ -396,6 +396,85 @@ class PlotSimulations:
         
         fig.write_image(filename, height=500, width=1200, scale=2.5)
         
+    def plot_std_by_method(self, filename):
+        """"""
+        df = (self.df
+              .groupby(['method', 'bag_percent'], as_index=False)['steps']
+              .std())
+        df['bag_percent'] = df['bag_percent'] * 100
+
+        methods = ['front-to-back', 'back-to-front', 'front-to-back WMA', 
+                   'back-to-front WMA', 'WMA', 'random', 'optimal']
+        subplot_titles = [method[0].upper() + method[1:] for method in methods]
+        colours = ['#003f5c', '#374c80', '#7a5195', '#bc5090', '#ef5675', 
+                   '#ff764a', '#ffa600']
+
+        fig = make_subplots(rows=2, cols=4, subplot_titles=subplot_titles,
+                            shared_yaxes=True)
+        for count, (method, colour) in enumerate(zip(methods, colours)):
+            fig.add_trace(
+                go.Bar(
+                    x=list(df[df['method'] == method]['bag_percent']),
+                    y=list(df[df['method'] == method]['steps']),
+                    marker=dict(
+                        color=colour, 
+                        opacity=0.8, 
+                        line=dict(
+                            color='black',
+                            width=2
+                        )
+                    ),
+                    showlegend=False,
+                ), 
+                row=count // 4 + 1,
+                col=count % 4 + 1,
+            )
+
+        xaxis=dict(
+            title=dict(
+                text="Bag %", 
+                standoff=0
+            ), 
+            linecolor='black', 
+            linewidth=2
+        )
+        yaxis=dict(
+            title=dict(
+                text="σ of Steps", 
+                standoff=0
+            ), 
+            linecolor='black',
+            linewidth=2,
+            gridcolor='rgb(220,220,220)',
+            gridwidth=1
+        )
+
+        fig.update_layout(
+            title=("Standard Deviations of Total Boarding Steps by Boarding "
+                   "Method and Bag Percentage<br><sub>For each boarding "
+                   "method, 1,000 simulations are run with each passenger bag "
+                   "percentage."),
+            height=600,
+            margin=dict(t=140),
+            plot_bgcolor='white',
+            xaxis=xaxis, 
+            xaxis2=xaxis, 
+            xaxis3=xaxis,
+            xaxis4=xaxis, 
+            xaxis5=xaxis,
+            xaxis6=xaxis,
+            xaxis7=xaxis,
+            yaxis=yaxis,
+            yaxis2=yaxis,
+            yaxis3=yaxis,
+            yaxis4=yaxis,
+            yaxis5=yaxis,
+            yaxis6=yaxis,
+            yaxis7=yaxis,
+        )
+        
+        fig.write_image(filename, height=500, width=1200, scale=2.5)
+        
 def main():
     """Ask to run either simulations or plotting of simulation data. 
     Then ask which type of simulation to run or plot. If simulations are
@@ -427,7 +506,8 @@ def main():
     
     elif sim_or_plot == 'plot':
         output = input(("Choose one of: 'by method', 'by aisles', "
-                        "'by number groups', 'regression by method'"))
+                        "'by number groups', 'regression by method', "
+                        "'std by method'"))
         filename = input("Filename: ")
         if output == 'by method':
             df = pd.read_csv('data/by_method_data.csv')
@@ -445,6 +525,10 @@ def main():
             df = pd.read_csv('data/by_method_data.csv')
             aero = PlotSimulations(df)
             aero.plot_regression_by_method(filename)
+        elif output == 'std by method':
+            df = pd.read_csv('data/by_method_data.csv')
+            aero = PlotSimulations(df)
+            aero.plot_std_by_method(filename)
         else:
             print("Invalid choice")
     
