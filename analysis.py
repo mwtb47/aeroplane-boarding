@@ -375,7 +375,7 @@ class PlotSimulations:
         fig.update_layout(
             title=("Linear OLS Models to Predict the Effect of Changing the "
                    "Bag Percentage on the Number of Boarding Steps<br>for "
-                   "each Boarding Method"),
+                   "Each Boarding Method"),
             plot_bgcolor='white', 
             xaxis=dict(
                 title=(r"$\text{Percentage of Passengers with Hand Luggage } "
