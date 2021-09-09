@@ -75,6 +75,12 @@ The four methods most affected by a change in bag percentage were those where al
 
 <img src="graphs/regression_by_method.png" alt="Regression - Steps by Method" width="100%"/>
 
+In addition to the average speed of boarding methods, the variance of boarding times might also be an important factor if consistency is valued. The chart below shows how the standard deviation of 1,000 simulations varies both within each method depending on the bag percentage, and across methods. 
+
+The methods which board by row - front-to-back, back-to-front, front-to-back WMA and back-to-front WMA - have relatively symmetrical distributions of standard deviations which peak at 50% bag percentage and decrease towards 0% and 100%. Two methods with random row orders, WMA and random, have standard deviations which increase as the bag percentage increases up to approximately 50%, after which they remain relatively stable. The optimal method has both the lowest variation among methods for each bag percentage (other than front-to-back WMA, 100% bags), and the lowest variation between bag percentages within the method.
+
+<img src="graphs/std_by_method.png" alt="Standard Deviation - Steps by Method" width="100%"/>
+
 ### Steps per boarding method by number of aisles
 
 The chart below shows the results from running each boarding method 1,000 times for two different arrangements of six seats per row. One arrangement has two aisles and the second has one.
