@@ -357,7 +357,7 @@ class Boarding:
         self.colour_list = [self.colours for i in range(len(self.positions))]
         
         
-    def plot_boarding_order(self, dpi):
+    def plot_boarding_order(self, filename, dpi):
         """Save a png file showing the order of boarding for a given 
         boarding method.
         """
@@ -452,8 +452,6 @@ class Boarding:
             )
         
         fig.tight_layout()
-        filename = self.method + '.png'
-        filename = filename.replace(' ', '_')
         fig.savefig(filename, dpi=dpi)
         
     def create_GIF(self, dpi):
@@ -569,6 +567,7 @@ def main(output):
     slow_average_fast = literal_eval(
         input("Proportions of slow, average, fast passengers: "))
     n_groups = int(input("Number of groups: "))
+    filename = input("Filename: ")
     dpi = int(input("GIF dpi: "))
     
     aero = Boarding(rows, abreast, method, bag_percent, slow_average_fast, 
@@ -577,7 +576,7 @@ def main(output):
     if output == 'GIF':
         aero.create_GIF(dpi)
     elif output == 'boarding order':
-        aero.plot_boarding_order(dpi)
+        aero.plot_boarding_order(filename, dpi)
     else:
         print("Choose 'GIF' or 'boarding order'")
 
