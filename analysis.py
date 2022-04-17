@@ -4,6 +4,7 @@ import time
 import pandas as pd
 
 from analysis_tools.multiple_runs import Simulations
+from analysis_tools.graphs import SimulationPlots
 
     
 
@@ -35,7 +36,7 @@ def main():
                 "    --simulate-by-aisles or --simulate-by-groups must be chosen"
             ))
     elif args.simulate_plot == 'plot':
-        if not any((args.plot_by_method, args.plot_by_aisles, args.plot_by_groups)):
+        if not any((args.plot_by_method, args.plot_by_aisles, args.plot_by_groups, args.plot_regression_by_method, args.plot_std_by_method)):
             raise ValueError((
                 "With --simulate-plot=plot, at least one of --plot-by-method,\n"
                 "    --plot-by-aisles, --plot-by-groups, --plot-regression-by-method or\n"
@@ -54,15 +55,22 @@ def main():
         if args.simulate_by_method:
             s.steps_by_method()
         if args.simulate_by_aisles:
-            start = time.perf_counter()
             s.steps_by_aisles()
-            end = time.perf_counter()
-            print(end - start)
         if args.simulate_by_groups:
-            start = time.perf_counter()
             s.steps_by_groups()
-            end = time.perf_counter()
-            print(end - start)
+
+    if args.simulate_plot == 'plot':
+        plots = SimulationPlots()
+        if args.plot_by_method:
+            plots.plot_steps_by_method('by_method_test.png')
+        if args.plot_by_aisles:
+            plots.plot_steps_by_aisles('by_aisles_test.png')
+        if args.plot_by_groups:
+            plots.plot_steps_by_groups('by_groups_test.png')
+        if args.plot_regression_by_method:
+            plots.plot_regression_by_method('regression_by_method_test.png')
+        if args.plot_std_by_method:
+            plots.plot_std_by_method('std_by_method_test.png')
 
     
 

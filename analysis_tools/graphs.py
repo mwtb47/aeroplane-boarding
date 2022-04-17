@@ -1,15 +1,19 @@
 from itertools import product
 
+import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from statsmodels.formula.api import smf
+import statsmodels.formula.api as smf
 
-class PlotSimulations:
+
+class SimulationPlots:
     """Class with methods to read simulations data and produce charts to
     summarise the data.
     """
-    def __init__(self, df):
-        self.df = df
+    def __init__(self):
+        self.df_methods = pd.read_csv('data/by_method_data.csv')
+        self.df_aisles = pd.read_csv('data/by_aisles_data.csv')
+        self.df_groups = pd.read_csv('data/by_number_groups_data.csv')
         self.category_order = [
             'front-to-back', 'back-to-front', 'WMA', 'front-to-back WMA',
             'back-to-front WMA', 'random', 'optimal'
@@ -20,8 +24,8 @@ class PlotSimulations:
         for different boarding methods with different passenger bag 
         percentages and save as a png file.
         """
-        df = self.df.copy()
-        df = df.sort_values('steps')
+        n_simulations = self.df_methods.groupby(['method', 'bag_percent']).size().reset_index(name='size')['size'].iloc[0]
+        df = self.df_methods.sort_values('steps')
         
         colours = ['#003f5c', '#444e86', '#955196', '#dd5182', '#ff6e54', '#ffa600']
         bag_percentages = [1, .8, .6, .4, .2, 0]
@@ -31,8 +35,8 @@ class PlotSimulations:
         for percent, colour in zip(bag_percentages, colours):
             fig.add_trace(
                 go.Box(
-                    x=list(df[df['bag_percent'] == percent]['method']),
-                    y=list(df[df['bag_percent'] == percent]['steps']),
+                    x=list(df.loc[df.bag_percent == percent, 'method']),
+                    y=list(df.loc[df.bag_percent == percent, 'steps']),
                     marker=dict(color=colour),
                     name=str(int(percent*100)),
                     hoverinfo='skip'
@@ -42,7 +46,7 @@ class PlotSimulations:
         fig.update_layout(
             boxmode='group', 
             title=("Distribution of Total Steps Taken to Board by Different "
-                   "Boarding Methods<br><sub>For each boarding method, 1,000 "
+                   f"Boarding Methods<br><sub>For each boarding method, {n_simulations:,d} "
                    "simulations were run with each passenger bag percentage."),
             legend=dict(
                 title="% Passengers<br>with Bag",
@@ -69,12 +73,13 @@ class PlotSimulations:
         
         fig.write_image(filename, height=500, width=1200, scale=2.5)
     
-    def plot_steps_by_no_aisles(self, filename: str):
+    def plot_steps_by_aisles(self, filename: str):
         """Plot a bar chart summarising the mean number of steps taken 
         for different boarding methods with seatin configurations and 
         save as a png file.
         """
-        df = self.df
+        n_simulations = self.df_aisles.groupby('configuration').size().reset_index(name='size')['size'].iloc[0]
+        df = self.df_aisles
         df = (
             df.groupby(['configuration', 'method'], as_index=False)
             .agg({'steps': ['mean', 'std']})
@@ -84,18 +89,18 @@ class PlotSimulations:
         
         fig = go.Figure()
         
-        for config, colour in zip(df['configuration'].unique(), colours):
+        for config, colour in zip(df.configuration.unique(), colours):
             fig.add_trace(
                 go.Bar(
-                    x=list(df[df['configuration'] == config]['method']),
-                    y=list(df[df['configuration'] == config][('steps', 'mean')]),
+                    x=list(df.loc[df.configuration == config, 'method']),
+                    y=list(df.loc[df.configuration == config, ('steps', 'mean')]),
                     marker=dict(
                         color=colour.format(0.7), 
                         line=dict(color=colour.format(1), width=2)
                     ),
                     name=str(config).replace('[', '').replace(']', ''),
                     error_y=dict(
-                        array=list(df[df['configuration'] == config][('steps', 'std')])
+                        array=list(df.loc[df.configuration == config, ('steps', 'std')]),
                     )
                 )
             )
@@ -104,9 +109,9 @@ class PlotSimulations:
             barmode='group', 
             bargroupgap=0.05,
             title=("Mean Steps to Board a Plane by Boarding Method<br><sub>"
-                   "For each boarding method, 1,000 simulations were run for "
-                   "each seating arrangement.<br>Error bars show the standard "
-                   "deviation."), 
+                   f"For each boarding method, {n_simulations:,d} simulations "
+                   "were run for each seating arrangement.<br>Error bars show "
+                   "the standard deviation."), 
             legend=dict(title="Seating arrangement"),
             xaxis=dict(
                 linewidth=2, 
@@ -128,12 +133,13 @@ class PlotSimulations:
         fig.write_image(filename, height=500, width=1200, scale=2.5)
         
         
-    def plot_steps_by_n_groups(self, filename: str):
+    def plot_steps_by_groups(self, filename: str):
         """Plot 4 boxplots summarising the mean number of steps taken 
         for different boarding methods with different numbers of groups 
         and passenger bag percentages and save as a png file.
         """
-        df = self.df
+        n_simulations = self.df_groups.groupby(['n_groups', 'bag_percent']).size().reset_index(name='size')['size'].iloc[0]
+        df = self.df_groups
         df = df.sort_values(['n_groups', 'bag_percent'])
         df['bag_percent']  = [int(n * 100) for n in df['bag_percent']]
         
@@ -151,8 +157,8 @@ class PlotSimulations:
             for percent, colour, offset in zip(df['bag_percent'].unique(), colours, offsets):
                 fig.add_trace(
                     go.Box(
-                        x=list(plot[plot['bag_percent'] == percent]['n_groups']),
-                        y=list(plot[plot['bag_percent'] == percent]['steps']),
+                        x=list(plot.loc[plot.bag_percent == percent, 'n_groups']),
+                        y=list(plot.loc[plot.bag_percent == percent, 'steps']),
                         marker=dict(color=colour),
                         name=str(percent),
                         hoverinfo='skip',
@@ -162,20 +168,14 @@ class PlotSimulations:
                 )
 
         xaxis = dict(
-            title=dict(
-                text="Groups",
-                standoff=1
-            ),
+            title=dict(text="Groups", standoff=1),
             linecolor='rgb(80,80,80)', 
             linewidth=2,
             type='category',
         )
         
         yaxis = dict(
-            title=dict(
-                text="Mean Steps", 
-                standoff=1,
-            ),
+            title=dict(text="Mean Steps", standoff=1),
             linecolor='rgb(80,80,80)', 
             linewidth=2,
             gridwidth=1, 
@@ -186,29 +186,20 @@ class PlotSimulations:
             boxmode='group',
             title=("Distribution of Total Steps Taken to Board by Different "
                    "Boarding Methods and Number of Boarding Groups<br><sub>"
-                   "For each boarding method and number of groups, 1,000 "
+                   f"For each boarding method and number of groups, {n_simulations:,d} "
                    "simulations are run for each bag percentage."),
             plot_bgcolor='white',
-            legend=dict(
-                title="% Passengers<br>with Bag",
-                traceorder='reversed',
-            ),
+            legend=dict(title="% Passengers<br>with Bag", traceorder='reversed'),
             margin=dict(t=150),
-            xaxis=xaxis,
-            xaxis2=xaxis,
-            xaxis3=xaxis,
-            xaxis4=xaxis,
-            yaxis=yaxis,
-            yaxis2=yaxis,
-            yaxis3=yaxis,
-            yaxis4=yaxis,
+            xaxis=xaxis, xaxis2=xaxis, xaxis3=xaxis, xaxis4=xaxis,
+            yaxis=yaxis, yaxis2=yaxis, yaxis3=yaxis, yaxis4=yaxis,
         )
         
         fig.write_image(filename, height=700, width=1200, scale=2.5)
         
     def plot_regression_by_method(self, filename: str):
         """"""
-        df = self.df
+        df = self.df_methods
         df['bag_percent'] = df['bag_percent'] * 100
         colours = ['red', 'green', 'blue', 'orange', 'lightblue', 'pink', 'purple']
 
@@ -223,15 +214,15 @@ class PlotSimulations:
 
             fig.add_trace(
                 go.Scatter(
-                    x=[0,100],
-                    y=[c, 100*m+c],
+                    x=[0, 100],
+                    y=[c, 100 * m + c],
                     line=dict(color=colour),
                     mode='lines',
                     name=method,
                     showlegend=False
                 )
             )
-            text_formula = "$s = {} p + {}$".format(round(m, 2), round(c,2))
+            text_formula = "$s = {} p + {}$".format(round(m, 2), round(c, 2))
             text_r2 = "$R^2 = {}$".format(round(r_2, 2))
             
             # Add a line, similar to a legend, and then add the method 
@@ -292,12 +283,13 @@ class PlotSimulations:
         
     def plot_std_by_method(self, filename: str):
         """"""
+        n_simulations = self.df_methods.groupby(['method', 'bag_percent']).size().reset_index(name='size')['size'].iloc[0]
         df = (
-            self.df
+            self.df_methods
             .groupby(['method', 'bag_percent'], as_index=False)['steps']
             .std()
         )
-        df['bag_percent'] = df['bag_percent'] * 100
+        #df['bag_percent'] = df['bag_percent'] * 100
 
         methods = [
             'front-to-back', 
@@ -320,8 +312,8 @@ class PlotSimulations:
         for count, (method, colour) in enumerate(zip(methods, colours)):
             fig.add_trace(
                 go.Bar(
-                    x=list(df[df['method'] == method]['bag_percent']),
-                    y=list(df[df['method'] == method]['steps']),
+                    x=list(df.loc[df.method == method, 'bag_percent']),
+                    y=list(df.loc[df.method == method, 'steps']),
                     marker=dict(
                         color=colour, 
                         opacity=0.8, 
@@ -337,18 +329,12 @@ class PlotSimulations:
             )
 
         xaxis=dict(
-            title=dict(
-                text="Bag %", 
-                standoff=0,
-            ), 
+            title=dict(text="Bag %", standoff=0), 
             linecolor='black', 
             linewidth=2,
         )
         yaxis=dict(
-            title=dict(
-                text="σ of Steps", 
-                standoff=0.
-            ), 
+            title=dict(text="σ of Steps", standoff=0), 
             linecolor='black',
             linewidth=2,
             gridcolor='rgb(220,220,220)',
@@ -358,25 +344,15 @@ class PlotSimulations:
         fig.update_layout(
             title=("Standard Deviations of Total Boarding Steps by Boarding "
                    "Method and Bag Percentage<br><sub>For each boarding "
-                   "method, 1,000 simulations are run with each passenger bag "
-                   "percentage."),
+                   f"method, {n_simulations:,d} simulations are run with "
+                   "each passenger bag percentage."),
             height=600,
             margin=dict(t=140),
             plot_bgcolor='white',
-            xaxis=xaxis, 
-            xaxis2=xaxis, 
-            xaxis3=xaxis,
-            xaxis4=xaxis, 
-            xaxis5=xaxis,
-            xaxis6=xaxis,
-            xaxis7=xaxis,
-            yaxis=yaxis,
-            yaxis2=yaxis,
-            yaxis3=yaxis,
-            yaxis4=yaxis,
-            yaxis5=yaxis,
-            yaxis6=yaxis,
-            yaxis7=yaxis,
+            xaxis=xaxis, xaxis2=xaxis, xaxis3=xaxis, xaxis4=xaxis, 
+            xaxis5=xaxis, xaxis6=xaxis, xaxis7=xaxis,
+            yaxis=yaxis, yaxis2=yaxis, yaxis3=yaxis, yaxis4=yaxis,
+            yaxis5=yaxis, yaxis6=yaxis, yaxis7=yaxis,
         )
         
         fig.write_image(filename, height=500, width=1200, scale=2.5)
