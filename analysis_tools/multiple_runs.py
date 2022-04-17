@@ -1,4 +1,4 @@
-import concurrent.futures
+from concurrent.futures import ProcessPoolExecutor
 from itertools import product
 import os
 import sys
@@ -16,6 +16,7 @@ def progress_bar(current_frame: int, total_frames: int, message: str):
     if current_frame + 1 == total_frames:
         print(f"\nCompleted iterations of steps by {message}")
 
+
 class Simulations:
     """Class with methods to run boarding simulations and save csv files
     for the following:
@@ -28,8 +29,8 @@ class Simulations:
         self.abreast = abreast
         self.bag_percent = bag_percent
         self.slow_average_fast = slow_average_fast
-        self.iterations = iterations
-        self.max_workers = os.get_cpu()
+        self.iterations = range(iterations)
+        self.max_workers = os.cpu_count()
         self.boarding_methods = [
             'front-to-back', 
             'back-to-front', 
@@ -40,97 +41,91 @@ class Simulations:
             'optimal',
         ]
 
+    def _run_simulations(
+            self,
+            job: str,
+            rows: int,
+            abreast: list,
+            boarding_methods: list,
+            bag_percent: float | list,
+            slow_average_fast: list,
+            n_groups: int | list):
+        """Created all combinations of the simulation parameters and perform 
+        the specified number of simulations for each combination.
+        """
+        parameters = list(product(
+            [rows],
+            [abreast] if isinstance(abreast[0], int) else abreast,
+            boarding_methods,
+            [bag_percent] if isinstance(bag_percent, float) else bag_percent,
+            [slow_average_fast],
+            [n_groups] if isinstance(n_groups, int) else n_groups,
+        ))[:2]
+        n_parameters = len(parameters)
+
+        print(f"Boarding by {job}...")
+        progress_bar(-1, n_parameters, job)
+
+        df = pd.DataFrame()
+        for count, (rows, abreast, boarding_method, bag_percent, slow_average_fast, n_gruops) in enumerate(parameters):
+            aero = BoardingSim(rows, abreast, boarding_method, bag_percent, slow_average_fast, n_gruops)
+            with ProcessPoolExecutor(max_workers=self.max_workers) as executor:
+                results = [executor.submit(aero.boarding_steps) for _ in self.iterations]
+            data = {
+                'abreast': ",".join(str(a) for a in abreast),
+                'boarding_method': boarding_method,
+                'bag_percent': bag_percent,
+                'n_groups': n_groups,
+                'steps': results,
+            }
+            df = pd.concat([df, pd.DataFrame(data)], axis=0)
+            progress_bar(count, n_parameters, job)
+        
+        df.to_csv(f'data2/by_{job}_data_additional.csv', index=False)
+
     def steps_by_method(self):
         """Save a csv file with the results from n simulations of 
         each combination of method and bag percentage.
         """
-        print("Boarding by method")
         bag_percentages = [0, .1, .2, .3, .4, .5, .6, .7, .8, .9, 1]
-        parameters = list(product(self.boarding_methods, bag_percentages))[:4]
-        
-        df = pd.DataFrame()
-        for n, (boarding_method, bag_percent) in enumerate(parameters):
-            aero = BoardingSim(
-                self.rows,
-                self.abreast,
-                boarding_method,
-                bag_percent, 
-                self.slow_average_fast,
-                self.rows,
-            )
-            with concurrent.futures.ProcessPoolExecutor(max_workers=self.max_workers) as executor:
-                results = [executor.submit(aero.boarding_steps) for _ in range(self.iterations)]
-            data = {
-                'boarding_method': boarding_method,
-                'bag_percent': bag_percent,
-                'steps': results,
-            }
-            df = df.append(pd.DataFrame(data), ignore_index=True)
-            progress_bar(n, len(parameters), "method")
-        
-        df.to_csv('data2/by_method_data_additional.csv', index=False)
+        self._run_simulations(
+            "method",
+            self.rows,
+            self.abreast,
+            self.boarding_methods,
+            bag_percentages,
+            self.slow_average_fast,
+            self.rows,
+        )
     
     def steps_by_aisles(self):
         """Save a csv file with the results from n simulations of 
         each combination of method and seating configuration.
         """
-        print("Boarding by aisles...")
         configurations = [[3,3], [2,2,2]]
-        parameters = list(product(self.boarding_methods, configurations))
-        n_parameters = len(parameters)
-
-        df = pd.DataFrame()
-        for n, (boarding_method, abreast) in enumerate(parameters):
-            aero = BoardingSim(
-                self.rows, 
-                abreast, 
-                boarding_method, 
-                self.bag_percent,
-                self.slow_average_fast,
-                self.rows,
-            )
-            with concurrent.futures.ProcessPoolExecutor(max_workers=self.max_workers) as executor:
-                results = [executor.submit(aero.boarding_steps) for _ in range(self.iterations)]
-            data = {
-                'boarding_method': boarding_method,
-                'configuration': str(abreast),
-                'steps': results,
-            }
-            df = df.append(pd.DataFrame(data), ignore_index=True)
-            progress_bar(n, n_parameters, "aisles")
-
-        df.to_csv('data2/by_aisles_data.csv', index=False)
+        self._run_simulations(
+            "aisles",
+            self.rows,
+            configurations,
+            self.boarding_methods,
+            self.bag_percent,
+            self.slow_average_fast,
+            self.rows,
+        )
     
     def steps_by_groups(self):
         """Save a csv file with the results from n simulations of 
         each combination of method, bag percentage and number of groups.
         """
-        print("Boarding by groups...")
         boarding_methods = ['front-to-back', 'back-to-front', 'front-to-back WMA', 'back-to-front WMA']
         bag_percentages = [0, 0.5, 1]
         n_groups = [1, 5, 10, 15]
-        parameters = list(product(boarding_methods, bag_percentages, n_groups))[:4]
-        n_parameters = len(parameters)
-
-        df = pd.DataFrame()
-        for n, (boarding_method, bag_percent, groups) in enumerate(parameters):
-            aero = BoardingSim(
-                self.rows, 
-                self.abreast, 
-                boarding_method, 
-                bag_percent,
-                self.slow_average_fast,
-                groups
-            )
-            with concurrent.futures.ProcessPoolExecutor(max_workers=self.max_workers) as executor:
-                results = [executor.submit(aero.boarding_steps) for _ in range(self.iterations)]
-            data = {
-                'boarding_method': boarding_method,
-                'bag_percent': bag_percent,
-                'n_groups': groups,
-                'steps': results,
-            }
-            df = df.append(pd.DataFrame(data), ignore_index=True)
-            progress_bar(n, n_parameters, "groups")
-        
-        df.to_csv('data2/by_number_groups_data.csv', index=False)
+        self._run_simulations(
+            "groups",
+            self.rows,
+            self.abreast,
+            boarding_methods,
+            bag_percentages,
+            self.slow_average_fast,
+            n_groups,
+        )
