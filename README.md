@@ -12,7 +12,7 @@ The Mythbusters did an experiment to measure the time taken to board using diffe
 
 <h1 align="center">Boarding Methods</h1>
 
-A combination of boarding methods are used ranging from completely random to where the exact order is specified. Below is a summary of the standard version of each method. Similar summaries are available for versions of these methods with either 2 boarding aisles or grouped boarding in the boarding_methods folder.
+A combination of boarding methods are used ranging from completely random to where the exact order is specified. Below is a summary of the standard version of each method. Similar summaries are available for versions of these methods with either 2 boarding aisles or grouped boarding in the boarding_method_plots folder.
 
 Each simulation takes the following arguments:
 - rows - the number of rows the aeroplane has
@@ -20,35 +20,35 @@ Each simulation takes the following arguments:
 - boarding_method - one of the seven methods shown below
 - bag_percent - the percentage of passengers with hand luggage.
 - slow_average_fast - the percentage of passengers who are slow, average and fast at putting their hand luggage away. Slow, average, and fast passengers take 3, 2, and 1 steps respectively to put their bags in the overhead compartment. Passengers without hand luggage take 0 steps.
-- n_groups - the number of groups passengers board in. This only has an effect on front-to-back, back-to-front, front-to-back WMA and back-to-front WMA methods. A more detailed descriptions can be found in the boarding_methods folder.
+- n_groups - the number of groups passengers board in. This only has an effect on front-to-back, back-to-front, front-to-back WMA and back-to-front WMA methods. A more detailed descriptions can be found in the boarding_method_plots folder.
 
 ### Back-to-front
 Passengers enter the plane in order of their row, starting with the last row. Within each row, the order of the passengers is random.  
-<img src="boarding_methods/Standard/back-to-front.png" alt="Back-to-front boarding method" width="75%"/>
+<img src="boarding_method_plots/Standard/back-to-front.png" alt="Back-to-front boarding method" width="75%"/>
 
 ### Front-to-back
 Passengers enter the plane in order of their row, starting with the first row. Within each row, the order of the passengers is random.  
-<img src="boarding_methods/Standard/front-to-back.png" alt="Front-to-back boarding method" width="75%"/>
+<img src="boarding_method_plots/Standard/front-to-back.png" alt="Front-to-back boarding method" width="75%"/>
 
 ### Window-middle-aisle
 Passengers enter the plane starting by window seats and moving towards ailse seats. Within each aisle, passengers enter in a random order.  
-<img src="boarding_methods/Standard/WMA.png" alt="Window-middle-aisle boarding method" width="75%"/>
+<img src="boarding_method_plots/Standard/WMA.png" alt="Window-middle-aisle boarding method" width="75%"/>
 
 ### Back-to-front window-middle-aisle
 Passengers enter the plane in order of their row, starting with the last row. Within each row, passengers are sorted from window seats to aisle seats.  
-<img src="boarding_methods/Standard/back-to-front_WMA.png" alt="Back-to-front window-middle-aisle boarding method" width="75%"/>
+<img src="boarding_method_plots/Standard/back-to-front_WMA.png" alt="Back-to-front window-middle-aisle boarding method" width="75%"/>
 
 ### Front-to-back window-middle-aisle
 Passengers enter the plane in order of their row, starting with the first row. Within each row, passengers are sorted from window seats to aisle seats.  
-<img src="boarding_methods/Standard/front-to-back_WMA.png" alt="Front-to-back window-middle-aisle boarding method" width="75%"/>
+<img src="boarding_method_plots/Standard/front-to-back_WMA.png" alt="Front-to-back window-middle-aisle boarding method" width="75%"/>
 
 ### Random
 Passengers enter the plane in a random order.  
-<img src="boarding_methods/Standard/random.png" alt="Random boarding method" width="75%"/>
+<img src="boarding_method_plots/Standard/random.png" alt="Random boarding method" width="75%"/>
 
 ### Optimal
 Passengers enter the plane sorted by aisle and row. Passengers from one window aisle enter, starting with the rear row. The other window aisle follows. Then the next aisle in etc.  
-<img src="boarding_methods/Standard/optimal.png" alt="Optimal boarding method" width="75%"/>
+<img src="boarding_method_plots/Standard/optimal.png" alt="Optimal boarding method" width="75%"/>
 
 
 <h1 align="center">Animations</h1>
