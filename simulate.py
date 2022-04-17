@@ -1,11 +1,9 @@
 import argparse
 from copy import deepcopy
-import sys
-import functools
 
-from boarding_methods import set_boarding_order
-from objects import AeroPlane, Passenger
-from visualisations import  create_GIF, plot_boarding_order
+from simulation.boarding_methods import set_boarding_order
+from simulation.objects import AeroPlane, Passenger
+from simulation.visualisations import  create_GIF, plot_boarding_order
 
 
 class BoardingSim:
@@ -102,6 +100,21 @@ class BoardingSim:
 
         self.plane = plane
 
+    def boarding_steps(self):
+        """Iterate through each passenger and run the update_passenger 
+        method on them until there are no passengers left unseated. At
+        the end of each iteration through the list of passengers, append 
+        the plane dictionary to a list. These dictionaries in this list 
+        represent one frame of the GIF animation. 
+        """
+        steps = 0
+        plane = self.create_aeroplane()
+        while not plane.check_all_seated():
+            for passenger in plane.passengers:
+                plane = passenger.move(plane)
+            steps += 1
+        return steps
+
 
 def print_boarding_summary(args, n_frames: int):
     lines = [
@@ -158,7 +171,7 @@ def main():
             filename = args.GIF_filename
         else:
             filename = f"{args.boarding_method}.gif"
-        create_GIF(boarding.plane, boarding.frames, boarding.boarding_method, args.GIF_filename, args.GIF_dpi)
+        create_GIF(boarding.plane, boarding.frames, boarding.boarding_method, filename, args.GIF_dpi)
 
         
 if __name__ == "__main__":
