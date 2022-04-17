@@ -6,13 +6,18 @@ from matplotlib.animation import FuncAnimation, PillowWriter
 import matplotlib.pyplot as plt
 
 
-def progress_bar(current_frame, total_frames):
-    progress = int(80 * (current_frame + 1) / total_frames)
+def progress_bar(current: int, total: int, frame_combination: str, job: str = None):
+    if frame_combination == 'frame':
+        finish_message = "\nRendering GIF from frames..."
+    else:
+        finish_message = f"\nCompleted iterations of steps by {job}"
+
+    progress = int(80 * (current + 1) / total)
     remaining = 80 - progress
-    sys.stdout.write(f"\r|{'█'* progress}{' ' * remaining}|   Frame {current_frame + 1} of {total_frames}")
+    sys.stdout.write(f"\r|{'█'* progress}{' ' * remaining}|   {frame_combination.capitalize()} {current + 1} of {total}")
     sys.stdout.flush()
-    if current_frame + 1 == total_frames:
-        print('\nRendering GIF from frames...')
+    if current + 1 == total:
+        print(finish_message)
 
 
 def set_passenger_colours(plane):

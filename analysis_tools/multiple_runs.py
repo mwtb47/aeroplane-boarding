@@ -5,16 +5,8 @@ import sys
 
 import pandas as pd
 
+from simulation.visualisations import progress_bar
 from simulate import BoardingSim
-
-
-def progress_bar(current_frame: int, total_frames: int, message: str):
-    progress = int(80 * (current_frame + 1) / total_frames)
-    remaining = 80 - progress
-    sys.stdout.write(f"\r|{'█'* progress}{' ' * remaining}|   Combination {current_frame + 1} of {total_frames}")
-    sys.stdout.flush()
-    if current_frame + 1 == total_frames:
-        print(f"\nCompleted iterations of steps by {message}")
 
 
 class Simulations:
@@ -64,7 +56,7 @@ class Simulations:
         n_parameters = len(parameters)
 
         print(f"Boarding by {job}...")
-        progress_bar(-1, n_parameters, job)
+        progress_bar(-1, n_parameters, 'combination', job)
 
         df = pd.DataFrame()
         for count, (rows, abreast, boarding_method, bag_percent, slow_average_fast, n_gruops) in enumerate(parameters):
@@ -79,7 +71,7 @@ class Simulations:
                 'steps': results,
             }
             df = pd.concat([df, pd.DataFrame(data)], axis=0)
-            progress_bar(count, n_parameters, job)
+            progress_bar(count, n_parameters, 'combination', job)
         
         df.to_csv(f'data2/by_{job}_data_additional.csv', index=False)
 
