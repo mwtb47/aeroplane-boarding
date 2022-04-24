@@ -5,6 +5,8 @@ import sys
 from matplotlib.animation import FuncAnimation, PillowWriter
 import matplotlib.pyplot as plt
 
+from simulation.objects import AeroPlane
+
 
 def progress_bar(current: int, total: int, frame_combination: str, job: str = None):
     if frame_combination == 'frame':
@@ -20,7 +22,7 @@ def progress_bar(current: int, total: int, frame_combination: str, job: str = No
         print(finish_message)
 
 
-def set_passenger_colours(plane):
+def set_passenger_colours(plane: AeroPlane) -> AeroPlane:
     """Create a list of colours the same length as the number of 
     passengers.
     """
@@ -31,7 +33,7 @@ def set_passenger_colours(plane):
     return plane
 
     
-def create_GIF_lists(frames):
+def create_GIF_lists(frames: list) -> list:
     """For each frame, a list of each passenger's current coordinates
     is created. The list of colours is also repeated for each frame 
     of the annimation.
@@ -42,7 +44,6 @@ def create_GIF_lists(frames):
         for passenger in plane_frame.passengers:
             seat = passenger.seat
             current_position = passenger.position
-            
             if passenger.seated:
                 passenger.current_location = seat
                 temp.append([current_position[0], current_position[1]])
@@ -53,7 +54,7 @@ def create_GIF_lists(frames):
     return positions
     
     
-def plot_boarding_order(plane, filename: str, dpi: int):
+def plot_boarding_order(plane: AeroPlane, filename: str, dpi: int):
     """Save a png file showing the order of boarding for a given 
     boarding method.
     """
@@ -152,7 +153,7 @@ def plot_boarding_order(plane, filename: str, dpi: int):
     print("Boarding order plotted\n")
     
 
-def create_GIF(plane, frames, boarding_method: str, filename: str, dpi: int):
+def create_GIF(plane: AeroPlane, frames: list, boarding_method: str, filename: str, dpi: int):
     """Create a GIF where each frame of the animation represents the 
     position of each passenger after each passenger has had the 
     opportunity to make one step.
@@ -246,6 +247,6 @@ def create_GIF(plane, frames, boarding_method: str, filename: str, dpi: int):
         filename,
         writer='pillow', 
         dpi=dpi, 
-        progress_callback=lambda current_frame, total_frames: progress_bar(current_frame, total_frames))
+        progress_callback=lambda current_frame, total_frames: progress_bar(current_frame, total_frames, 'frame'))
     plt.close()
     print(f"GIF saved as {filename} ({os.path.getsize(filename) / 1000000:.2f}Mb)\n")
