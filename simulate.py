@@ -46,8 +46,14 @@ class BoardingSim:
         n_groups - the number of groups in which passengers board.
     """
     
-    def __init__(self, rows: int, abreast: int, boarding_method: str, bag_percent: float, 
-                 slow_average_fast: list, n_groups: int):
+    def __init__(
+            self,
+            rows: int,
+            abreast: int,
+            boarding_method: str,
+            bag_percent: float, 
+            slow_average_fast: list,
+            n_groups: int):
         self.rows = rows
         self.abreast = abreast
         self.boarding_method = boarding_method
@@ -56,30 +62,15 @@ class BoardingSim:
         self.fast_percent = slow_average_fast[2]
         self.n_groups = n_groups
     
-    def create_aeroplane(self) -> dict:
-        """Return a dictionary of passengers with the following 
-        structure, ordered according the the boarding method:
-        
-        Key - passenger number (0 to n-1)
-        
-        Value - dictionary containing:
-            target - the passenger's seat as a tuple (e.g. (1,2))
-            row - the row the passenger is currently in (0 if either not
-                  yet on the plane or already seated)
-            seated - whether the passenger is seated or not yet
-            bag_countdown - represents the number of steps to put the 
-                            bag away. 0 represents no bag to put away. 
-                            1, 2 or 3 are assigned depending on whether 
-                            the passenger is slow, average or fast. 
+    def create_aeroplane(self) -> AeroPlane:
+        """Return an instance of the AeroPlane class.
         """
         plane = AeroPlane(self.abreast, self.rows)
-        
-        # Coordinates of all seats on the plane, sorted by boarding method.
         plane = set_boarding_order(plane, self.boarding_method, self.n_groups)
         plane.passengers = [Passenger(seat) for seat in plane.seats]
         plane.set_boarding_aisles()
-        plane.assign_boarding_speeds(self.slow_percent, self.fast_percent)
         plane.assign_bags(self.bag_percent)
+        plane.assign_boarding_speeds(self.slow_percent, self.fast_percent)
         plane.set_passenger_colours()
         return plane
 
@@ -116,7 +107,7 @@ class BoardingSim:
         return steps
 
 
-def print_boarding_summary(args, n_frames: int):
+def print_boarding_summary(args: argparse.Namespace, n_frames: int):
     lines = [
         "\nAeroplane boarding simulation",
         "-----------------------------",
@@ -135,12 +126,12 @@ def print_boarding_summary(args, n_frames: int):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--rows', required=False, default=10, type=int, help="Number of rows in plane (default: 10)")
+    parser.add_argument('--rows', required=False, default=15, type=int, help="Number of rows in plane (default: 10)")
     parser.add_argument('--abreast', required=False, default="3,3", type=str, help="Comma separated seat blocks. e.g. '3,3' for 3 seats, aisle, 3 seats (default: '3,3'")
     parser.add_argument('--boarding-method', required=False, default="random", type=str, help="Boarding method (default: random)")
     parser.add_argument('--bag-percent', required=False, default=50, type=int, help="Percentage of passengers with bags (default: 50)")
     parser.add_argument('--slow-medium-fast', required=False, default="30,40,30", type=str, help="Percentage of slow, medium, and fast boarders (default: '30,40,30')")
-    parser.add_argument('--groups', required=False, default=1, type=int, help="Number of boarding groups (default: 1)")
+    parser.add_argument('--groups', required=False, default=1, type=int, help="Number of boarding groups (default: number of rows)")
     parser.add_argument('--plot-boarding-order', required=False, action='store_true', help="Plot boarding order")
     parser.add_argument('--boarding-order-filename', required=False, type=str, help="Filename of boarding order plot")
     parser.add_argument('--boarding-order-dpi', required=False, default=100, type=int, help="dpi of boarding order plot")
