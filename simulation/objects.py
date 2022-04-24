@@ -58,6 +58,13 @@ class AeroPlane:
                               if distances[i] == min_distance]
                 passenger.position = (0, choice(min_aisles))
 
+    def assign_bags(self, bag_percent: float):
+        n_bags = ceil(self.n_passengers * bag_percent)
+        bags = [True] * n_bags + [False] * (self.n_passengers - n_bags)
+        shuffle(bags)
+        for passenger, has_bag in zip(self.passengers, bags):
+            passenger.bag = 1 if has_bag else 0
+
     def assign_boarding_speeds(self, slow_percent: float, fast_percent: float):
         n_slow = ceil(self.n_passengers * slow_percent)
         n_fast = ceil(self.n_passengers * fast_percent)
@@ -66,13 +73,6 @@ class AeroPlane:
         shuffle(speeds)
         for passenger, speed in zip(self.passengers, speeds):
             passenger.boarding_speed = speed if passenger.bag == 1 else 0
-
-    def assign_bags(self, bag_percent: float):
-        n_bags = ceil(self.n_passengers * bag_percent)
-        bags = [True] * n_bags + [False] * (self.n_passengers - n_bags)
-        shuffle(bags)
-        for passenger, has_bag in zip(self.passengers, bags):
-            passenger.bag = 1 if has_bag else 0
 
     def get_occupied(self) -> set:
         """Return a list of walking aisle positions currently occupied."""
