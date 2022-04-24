@@ -1,6 +1,8 @@
 from random import shuffle
+
+from simulation.objects import AeroPlane
         
-def set_boarding_order(plane, boarding_method: str, n_groups: int) -> list:
+def set_boarding_order(plane: AeroPlane, boarding_method: str, n_groups: int) -> list:
     """Sort the list of passengers according to the specified 
     boarding method. For front and reverse WMA methods the 
     passenger list is created from scratch.
@@ -27,10 +29,13 @@ def set_boarding_order(plane, boarding_method: str, n_groups: int) -> list:
     return plane
 
 
-def group_back_front(plane, n_groups):
+def group_back_front(plane: AeroPlane, n_groups: int) -> list:
     """Group passengers for back-to-front and front-to-back 
     boarding methods.
     """
+    if n_groups == 1:
+        return [passenger for passenger in plane.seats]
+    
     group_sizes = [plane.rows // n_groups] * n_groups
     remainder = plane.rows % n_groups
     for i in range(remainder):
@@ -41,15 +46,20 @@ def group_back_front(plane, n_groups):
     for i in group_sizes:
         total += i * sum(plane.abreast)
         group_index.append(total)
-        
-    groups = [plane.seats[group_index[i]: group_index[i+1]] 
-                for i in range(len(group_index)-1)]
-    shuffle(groups)
+
+    groups = []
+    for i in range(len(group_index) - 1):
+        group = plane.seats[group_index[i]: group_index[i+1]]
+        shuffle(group)
+        groups.append(group)
+
     return [passenger for group in groups for passenger in group]
 
 
-def group_WMA(plane, boarding_method, n_groups) -> list:
+def group_WMA(plane: AeroPlane, boarding_method: str, n_groups: int) -> list:
     """Return passenger list for grouped WMA boarding."""
+    n_groups = plane.rows if n_groups == 1 else n_groups
+
     group_sizes = [plane.rows // n_groups] * n_groups
     remainder = plane.rows % n_groups
     for i in range(remainder):
