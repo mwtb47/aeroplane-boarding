@@ -21,7 +21,7 @@ class Simulations:
         self.bag_percent = bag_percent
         self.slow_average_fast = slow_average_fast
         self.iterations = range(iterations)
-        self.max_workers = os.cpu_count()
+        self.max_workers = os.cpu_count() - 1
         self.boarding_methods = [
             'front-to-back', 
             'back-to-front', 
@@ -87,7 +87,7 @@ class Simulations:
             self.boarding_methods,
             bag_percentages,
             self.slow_average_fast,
-            1,
+            self.rows,
         )
     
     def steps_by_aisles(self):
@@ -102,7 +102,7 @@ class Simulations:
             self.boarding_methods,
             self.bag_percent,
             self.slow_average_fast,
-            1,
+            self.rows,
         )
     
     def steps_by_groups(self):
@@ -111,7 +111,7 @@ class Simulations:
         """
         boarding_methods = ['front-to-back', 'back-to-front', 'front-to-back WMA', 'back-to-front WMA']
         bag_percentages = [0, 0.5, 1]
-        n_groups = [1, 5, 10, 15]
+        n_groups = [1, 3, 6, 9, 12, 15]
         self._run_simulations(
             "groups",
             self.rows,
