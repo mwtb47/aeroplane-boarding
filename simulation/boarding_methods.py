@@ -33,9 +33,6 @@ def group_back_front(plane: AeroPlane, n_groups: int) -> list:
     """Group passengers for back-to-front and front-to-back 
     boarding methods.
     """
-    if n_groups == 1:
-        return [passenger for passenger in plane.seats]
-    
     group_sizes = [plane.rows // n_groups] * n_groups
     remainder = plane.rows % n_groups
     for i in range(remainder):
@@ -58,8 +55,6 @@ def group_back_front(plane: AeroPlane, n_groups: int) -> list:
 
 def group_WMA(plane: AeroPlane, boarding_method: str, n_groups: int) -> list:
     """Return passenger list for grouped WMA boarding."""
-    n_groups = plane.rows if n_groups == 1 else n_groups
-
     group_sizes = [plane.rows // n_groups] * n_groups
     remainder = plane.rows % n_groups
     for i in range(remainder):
