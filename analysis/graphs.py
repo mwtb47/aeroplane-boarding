@@ -83,24 +83,8 @@ class SimulationPlots:
                 valign='middle',
             ),
             xaxis_categoryarray=self.category_order,
-            # xaxis=dict(
-            #     showline=True,
-            #     linewidth=2,
-            #     linecolor='rgb(100,100,100)',
-            #     categoryarray=self.category_order,
-            # ),
             yaxis_title="Number of Steps",
-            # yaxis=dict(
-            #     title="Number of Steps",
-            #     showline=True,
-            #     linewidth=2,
-            #     linecolor='rgb(100,100,100)',
-            #     gridwidth=1,
-            #     gridcolor='rgba(100,100,100,0.2)',
-            # ),
             height=600,
-            # paper_bgcolor='white',
-            # plot_bgcolor='white',
         )
         
         fig.write_image(filename, height=500, width=1200, scale=2.5)
@@ -111,7 +95,7 @@ class SimulationPlots:
         for different boarding methods with seatin configurations and 
         save as a png file.
         """
-        n_simulations = self.df_aisles.groupby('configuration').size().reset_index(name='size')['size'].iloc[0]
+        n_simulations = self.df_aisles.groupby(['configuration', 'boarding_method']).size().reset_index(name='size')['size'].iloc[0]
         df = self.df_aisles
         df = (
             df.groupby(['configuration', 'boarding_method'], as_index=False)
@@ -149,21 +133,7 @@ class SimulationPlots:
             legend=dict(title="Seating arrangement"),
             xaxis_categoryarray=self.category_order,
             yaxis_title="Mean Steps",
-            # xaxis=dict(
-            #     linewidth=2, 
-            #     linecolor='rgb(80,80,80)',
-            #     categoryarray=self.category_order,
-            # ),
-            # yaxis=dict(
-            #     title="Mean Steps", 
-            #     linewidth=2, 
-            #     linecolor='rgb(80,80,80)', 
-            #     gridwidth=1, 
-            #     gridcolor='rgba(200,200,200,0.5)',
-            # ),
             margin=dict(t=120),
-            # paper_bgcolor='white',
-            # plot_bgcolor='white',
         )
         
         fig.write_image(filename, height=500, width=1200, scale=2.5)
@@ -183,8 +153,8 @@ class SimulationPlots:
         methods = ['front-to-back', 'back-to-front', 'front-to-back WMA', 'back-to-front WMA']
         coordinates = list(product(range(1,3), range(1,3)))
         subplot_titles = ['Front-to-back', 'Back-to-front', 'Front-to-back WMA', 'Back-to-front WMA']
-        colours = ['#003f5c', '#955196', '#ff6e54']
-        offsets = ['0%', '50%', '100%']
+        colours = ['#003f5c', 'rgb(20,20,20)', '#955196', 'rgb(20,20,20)', '#ff6e54']
+        offsets = ['0%', '33%', '50%', '66%', '100%']
         showlegend_list = [True, False, False, False]
 
         fig = make_subplots(rows=2, cols=2, subplot_titles=subplot_titles)
@@ -197,7 +167,7 @@ class SimulationPlots:
                         x=list(plot.loc[plot.bag_percent == percent, 'n_groups']),
                         y=list(plot.loc[plot.bag_percent == percent, 'steps']),
                         marker=dict(color=colour),
-                        name=str(percent),
+                        name=f"{percent}%",
                         hoverinfo='skip',
                         showlegend=showlegend,
                         offsetgroup=offset,
@@ -304,23 +274,7 @@ class SimulationPlots:
             xaxis_title=r"$\text{Percentage of Passengers with Hand Luggage } (p)$",
             xaxis_gridcolor='rgb(240,240,240)',
             xaxis_gridwidth=1,
-            # plot_bgcolor='white', 
-            # xaxis=dict(
-            #     title=(r"$\text{Percentage of Passengers with Hand Luggage } "
-            #            "(p)$"),
-            #     linecolor='black',
-            #     linewidth=2, 
-            #     gridcolor='rgb(240,240,240)',
-            #     gridwidth=1
-            # ),
             yaxis_title=r"$\text{Boarding Steps } (s)$",
-            # yaxis=dict(
-            #     title=r"$\text{Boarding Steps } (s)$",
-            #     linecolor='black',
-            #     linewidth=2, 
-            #     gridcolor='rgb(240,240,240)', 
-            #     gridwidth=1
-            # ),
         )
         
         fig.write_image(filename, height=500, width=1200, scale=2.5)
@@ -334,7 +288,6 @@ class SimulationPlots:
             .groupby(['boarding_method', 'bag_percent'], as_index=False)['steps']
             .std()
         )
-        #df['bag_percent'] = df['bag_percent'] * 100
 
         methods = [
             'front-to-back', 
