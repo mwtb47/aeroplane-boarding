@@ -13,9 +13,9 @@ class SimulationPlots:
     """
     def __init__(self):
         self._create_graph_template()
-        self.df_methods = pd.read_csv('data2/by_method_data_additional.csv')
-        self.df_aisles = pd.read_csv('data2/by_aisles_data_additional.csv')
-        self.df_groups = pd.read_csv('data2/by_groups_data_additional.csv')
+        self.df_methods = pd.read_csv('data/by_method_data.csv')
+        self.df_aisles = pd.read_csv('data/by_aisles_data.csv')
+        self.df_groups = pd.read_csv('data/by_groups_data.csv')
         self.category_order = [
             'front-to-back', 'back-to-front', 'WMA', 'front-to-back WMA',
             'back-to-front WMA', 'random', 'optimal'
@@ -87,7 +87,7 @@ class SimulationPlots:
             height=600,
         )
         
-        fig.write_image(filename, height=500, width=1200, scale=2.5)
+        fig.write_image('media/graphs/' + filename, height=500, width=1200, scale=2.5)
         print(f"Graph {filename} saved.")
     
     def plot_steps_by_aisles(self, filename: str):
@@ -136,7 +136,7 @@ class SimulationPlots:
             margin=dict(t=120),
         )
         
-        fig.write_image(filename, height=500, width=1200, scale=2.5)
+        fig.write_image('media/graphs/' + filename, height=500, width=1200, scale=2.5)
         print(f"Graph {filename} saved.")
         
         
@@ -203,7 +203,7 @@ class SimulationPlots:
             yaxis=yaxis, yaxis2=yaxis, yaxis3=yaxis, yaxis4=yaxis,
         )
         
-        fig.write_image(filename, height=700, width=1200, scale=2.5)
+        fig.write_image('media/graphs/' + filename, height=700, width=1200, scale=2.5)
         print(f"Graph {filename} saved.")
         
     def plot_regression_by_method(self, filename: str):
@@ -277,7 +277,7 @@ class SimulationPlots:
             yaxis_title=r"$\text{Boarding Steps } (s)$",
         )
         
-        fig.write_image(filename, height=500, width=1200, scale=2.5)
+        fig.write_image('media/graphs/' + filename, height=500, width=1200, scale=2.5)
         print(f"Graph {filename} saved.")
         
     def plot_std_by_method(self, filename: str):
@@ -353,5 +353,5 @@ class SimulationPlots:
             yaxis5=yaxis, yaxis6=yaxis, yaxis7=yaxis,
         )
         
-        fig.write_image(filename, height=500, width=1200, scale=2.5)
+        fig.write_image('media/graphs/' + filename, height=500, width=1200, scale=2.5)
         print(f"Graph {filename} saved.")
