@@ -72,8 +72,8 @@ class Simulations:
             df = pd.concat([df, pd.DataFrame(data)], axis=0)
             progress_bar(count, n_parameters, 'combination', job)
         
-        df.to_csv(f'data2/by_{job}_data_additional.csv', index=False)
-        print(f"by_{job}_data_additional.csv saved.\n")
+        df.to_csv(f'data/by_{job}_data.csv', index=False)
+        print(f"by_{job}_data.csv saved.\n")
 
     def steps_by_method(self):
         """Save a csv file with the results from n simulations of 
