@@ -8,41 +8,37 @@ from simulation.visualisations import  create_GIF, plot_boarding_order
 
 class BoardingSim:
     """Class to simulate the boarding of a plane using different
-    boarding methods and produce a GIF to animate the boarding process.
+    boarding methods.
     
     Arguments
         rows - the numbers of rows in the aircraft
         abreast - arrangement of seats in a row as a list, each element 
-                  being a cluster of seats not separated by an aisle.
-                  e.g. 2 seats, aisle, 2 seats is [2,2], 
-                  2 seats, aisle, 3 seats, aisle, 2 seats is [2,3,2]
-        boarding_method - the boarding method used
+            being a cluster of seats not separated by an aisle.
+            e.g. 2 seats, aisle, 2 seats is [2,2], 2 seats, aisle, 
+            3 seats, aisle, 2 seats is [2,3,2]
+        boarding_method - the boarding method used:
             random - passengers board in a random order
             back-to-front - passengers are sorted by row starting with 
-                            the rear, aisle order is random
+                the rear, aisle order is random
             front-to-back - passengers are sorted by row starting with 
-                            the front, aisle order is random
+                the front, aisle order is random
             WMA - passengers are sorted by aisles, starting with the 
-                  window seats and ending with the aisle seats. Within 
-                  each aisle the order is random. 
+                window seats and ending with the aisle seats. Within 
+                each aisle the order is random. 
             front-to-back WMA - passengers are sorted by row starting 
-                                at the front. Within each row,
-                                passengers are sorted so those in window
-                                seats enter first and those in aisle 
-                                seats last.
+                at the front. Within each row, passengers are sorted so 
+                those in window seats enter first and those in aisle 
+                seats last.
             back-to-front WMA - passengers are sorted by row starting at
-                                the front. Within each row, passengers 
-                                are sorted so those in window seats 
-                                enter first and those in aisle seats
-                                last.
+                the front. Within each row, passengers are sorted so 
+                those in window seats enter first and those in aisle 
+                seats last.
             optimal - passengers are sorted by aisle, starting by window 
-                      seats and ending with aisle seats. Within each 
-                      aisle passengers are sorted by rear row to front 
-                      row.
+                seats and ending with aisle seats. Within each aisle 
+                passengers are sorted by rear row to front row.
         bag_percent - the proportion of passengers with bags
         slow_medium_fast - list of proportion of passengers who are
-                           slow, medium and fast at boarding. 
-                           e.g. [0.2, 0.4, 0.4]
+            slow, medium and fast at boarding. e.g. [0.2, 0.4, 0.4]
         n_groups - the number of groups in which passengers board.
     """
     
@@ -63,8 +59,11 @@ class BoardingSim:
         self.n_groups = n_groups
     
     def create_aeroplane(self) -> AeroPlane:
-        """Return an instance of the AeroPlane class.
-        """
+        """Create an instance on the AeroPlane class and set up according
+        to the specified parameters.
+        
+        Return
+            Instance of AeroPlane class."""
         plane = AeroPlane(self.abreast, self.rows)
         plane = set_boarding_order(plane, self.boarding_method, self.n_groups)
         plane.passengers = [Passenger(seat) for seat in plane.seats]
@@ -75,10 +74,10 @@ class BoardingSim:
         return plane
 
     def board_plane(self):
-        """Iterate through each passenger and run the update_passenger 
-        method on them until there are no passengers left unseated. At
-        the end of each iteration through the list of passengers, append 
-        the plane dictionary to a list. These dictionaries in this list 
+        """Iterate through each passenger and call the move method on 
+        them until there are no passengers left unseated. At the end of 
+        each iteration through the list of passengers, append a copy of 
+        the AeroPlane instance to a list. The instances in this list 
         represent one frame of the GIF animation. 
         """
         print('Boarding plane...')
@@ -91,12 +90,12 @@ class BoardingSim:
 
         self.plane = plane
 
-    def boarding_steps(self):
-        """Iterate through each passenger and run the update_passenger 
-        method on them until there are no passengers left unseated. At
-        the end of each iteration through the list of passengers, append 
-        the plane dictionary to a list. These dictionaries in this list 
-        represent one frame of the GIF animation. 
+    def boarding_steps(self) -> int:
+        """Iterate through each passenger and call the move method on 
+        them until there are no passengers left unseated. 
+        
+        Return
+            Count of the number of steps to board plane.
         """
         steps = 0
         plane = self.create_aeroplane()
@@ -122,7 +121,7 @@ def print_boarding_summary(args: argparse.Namespace, n_frames: int):
         f"Number of steps  - {n_frames}\n",
     ]
     print("\n".join(lines))
-
+    
 
 def main():
     parser = argparse.ArgumentParser()
@@ -147,22 +146,15 @@ def main():
     slow_medium_fast = [int(i) / 100 for i in args.slow_medium_fast.split(',')]
     n_groups = args.groups
 
-    boarding = BoardingSim(rows, abreast, boarding_method, bag_percent, slow_medium_fast, n_groups)
-    boarding.board_plane()
-    print_boarding_summary(args, len(boarding.frames))
+    simulation = BoardingSim(rows, abreast, boarding_method, bag_percent, slow_medium_fast, n_groups)
+    simulation.board_plane()
+    print_boarding_summary(args, len(simulation.frames))
 
     if args.plot_boarding_order:
-        if args.boarding_order_filename:
-            filename = args.boarding_order_filename
-        else:
-            filename = f"boarding_order_{args.boarding_method}.png"
-        plot_boarding_order(boarding.plane, filename, args.boarding_order_dpi)
+        plot_boarding_order(simulation.plane, args)
+        
     if args.create_GIF:
-        if args.GIF_filename:
-            filename = args.GIF_filename
-        else:
-            filename = f"{args.boarding_method}.gif"
-        create_GIF(boarding.plane, boarding.frames, boarding.boarding_method, filename, args.GIF_dpi)
+        create_GIF(simulation.plane, simulation.frames, args)
 
         
 if __name__ == "__main__":
