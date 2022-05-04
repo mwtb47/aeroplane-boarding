@@ -47,7 +47,7 @@ def run(args: argparse.Namespace):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--rows', required=False, default=15, type=int, help="Number of rows in plane (default: 10)")
+    parser.add_argument('--rows', required=False, default=15, type=int, help="Number of rows in plane (default: 15)")
     parser.add_argument('--abreast', required=False, default="3,3", type=str, help="Comma separated seat blocks. e.g. '3,3' for 3 seats, aisle, 3 seats (default: '3,3'")
     parser.add_argument('--bag-percent', required=False, default=50, type=int, help="Percentage of passengers with bags (default: 50)")
     parser.add_argument('--slow-medium-fast', required=False, default="30,40,30", type=str, help="Percentage of slow, medium, and fast boarders (default: '30,40,30')")
