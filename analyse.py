@@ -38,11 +38,11 @@ def run(args: argparse.Namespace):
 
     if args.simulate_plot == 'plot':
         plots = SimulationPlots()
-        if args.plot_by_method: plots.plot_steps_by_method('by_method_test.png')
-        if args.plot_by_aisles: plots.plot_steps_by_aisles('by_aisles_test.png')
-        if args.plot_by_groups: plots.plot_steps_by_groups('by_groups_test.png')
-        if args.plot_regression_by_method: plots.plot_regression_by_method('regression_by_method_test.png')
-        if args.plot_std_by_method: plots.plot_std_by_method('std_by_method_test.png')
+        if args.plot_by_method: plots.plot_steps_by_method('by_method.png')
+        if args.plot_by_aisles: plots.plot_steps_by_aisles('by_aisles.png')
+        if args.plot_by_groups: plots.plot_steps_by_groups('by_groups.png')
+        if args.plot_regression_by_method: plots.plot_regression_by_method('regression_by_method.png')
+        if args.plot_std_by_method: plots.plot_std_by_method('std_by_method.png')
 
 
 def main():
