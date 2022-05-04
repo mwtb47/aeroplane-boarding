@@ -1,3 +1,4 @@
+import argparse
 from math import ceil, floor
 import os
 import sys
@@ -54,16 +55,21 @@ def create_GIF_lists(frames: list) -> list:
     return positions
     
     
-def plot_boarding_order(plane: AeroPlane, filename: str, dpi: int):
+def plot_boarding_order(plane: AeroPlane, args: argparse.Namespace):
     """Save a png file showing the order of boarding for a given 
     boarding method.
     """
     print("Plotting boarding order...")
+    if args.boarding_order_filename:
+        filename = args.boarding_order_filename
+    else:
+        filename = f"boarding_order_{args.boarding_method}.png"
+
     abreast = sum(plane.abreast)
     x = [passenger.seat[0] for passenger in plane.passengers]
     y = [passenger.seat[1] for passenger in plane.passengers]
     
-    fig = plt.figure(figsize=(12, 12 * (abreast / plane.rows)), dpi=dpi)
+    fig = plt.figure(figsize=(12, 12 * (abreast / plane.rows)), dpi=args.boarding_order_dpi)
     plt.axes(
         xlim=(0.5, plane.rows + 0.5), 
         ylim=(0.5, abreast + len(plane.walkway_aisles) + 0.5)
@@ -149,15 +155,21 @@ def plot_boarding_order(plane: AeroPlane, filename: str, dpi: int):
     fig.tight_layout()
 
     filename = filename if filename.endswith('.png') else filename.split('.')[0] + '.png'
-    fig.savefig(filename, dpi=dpi)
+    fig.savefig(filename, dpi=args.boarding_order_dpi)
     print("Boarding order plotted\n")
     
 
-def create_GIF(plane: AeroPlane, frames: list, boarding_method: str, filename: str, dpi: int):
+def create_GIF(plane: AeroPlane, frames: list, args: argparse.Namespace):
     """Create a GIF where each frame of the animation represents the 
     position of each passenger after each passenger has had the 
     opportunity to make one step.
     """
+    print("Creating GIF...")
+    if args.GIF_filename:
+        filename = args.GIF_filename
+    else:
+        filename = f"{args.boarding_method}.gif"
+
     positions = create_GIF_lists(frames)
     colour_lists = [[passenger.colour for passenger in frame.passengers] for frame in frames]
     abreast = sum(plane.abreast)
@@ -171,7 +183,7 @@ def create_GIF(plane: AeroPlane, frames: list, boarding_method: str, filename: s
 
     fig = plt.figure(
         figsize=(12, 12 * ((abreast + len(plane.abreast) - 1 ) / plane.rows)),
-        dpi=dpi)
+        dpi=args.GIF_dpi)
     plt.axes(
         xlim=(0.5, plane.rows + 0.5), 
         ylim=(0.5, abreast + len(plane.abreast) - 0.5)
@@ -180,7 +192,7 @@ def create_GIF(plane: AeroPlane, frames: list, boarding_method: str, filename: s
     # Not sure why but without this the title font is heavily 
     # pixelated.
     fig.patch.set_facecolor('white')
-    title_str = ('Method: ' + boarding_method + '  -  Steps: ' + str(len(frames)))
+    title_str = f"Method: {args.boarding_method} - Steps: {str(len(frames))}"
     plt.title(title_str, loc='left')
     
     # Add squares to represent the seats and add text to show their 
@@ -242,11 +254,10 @@ def create_GIF(plane: AeroPlane, frames: list, boarding_method: str, filename: s
     )
 
     filename = filename if filename.endswith('.gif') else filename.split('.')[0] + '.gif'
-    print("Creating GIF...")
     anim.save(
         filename,
         writer='pillow', 
-        dpi=dpi, 
+        dpi=args.GIF_dpi, 
         progress_callback=lambda current_frame, total_frames: progress_bar(current_frame, total_frames, 'frame'))
     plt.close()
     print(f"GIF saved as {filename} ({os.path.getsize(filename) / 1000000:.2f}Mb)\n")
