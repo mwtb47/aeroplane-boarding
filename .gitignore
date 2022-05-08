@@ -2,6 +2,3 @@ __pycache__
 .DS_Store
 .vscode
 *.ipynb
-*.csv
-*.png
-*.gif
